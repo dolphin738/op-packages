@@ -34,6 +34,7 @@ jobs:
           # 支持多个文件/文件夹，用换行或分号分隔，这里用多行字符串方便阅读
           FILE_MAP: |
             luci-app-adguardhome:luci-app-adguardhome
+            luci-app-wrtbwmon:luci-app-wrtbwmon
             wrtbwmon:wrtbwmon
             luci-app-netspeedtest:luci-app-netspeedtest
             homebox:homebox
