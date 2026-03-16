@@ -33,21 +33,20 @@ jobs:
           # 定义需要同步的文件列表 (格式: "上游路径:本地目标路径")
           # 支持多个文件/文件夹，用换行或分号分隔，这里用多行字符串方便阅读
           FILE_MAP: |
-            luci-app-adguardhome:luci-app-adguardhome
-            luci-app-wrtbwmon:luci-app-wrtbwmon
-            wrtbwmon:wrtbwmon
-            luci-app-netspeedtest:luci-app-netspeedtest
+            luci-app-adguardhome:./
+            luci-app-wrtbwmon:./
+            wrtbwmon:./
+            luci-app-netspeedtest:./
             homebox:./
-            ookla-speedtest:ookla-speedtest
-            luci-app-turboacc:luci-app-turboacc
-            shortcut-fe:shortcut-fe
-            luci-app-easytier:luci-app-easytier
-            easytier:easytier
-            luci-app-taskplan:luci-app-taskplan
-            luci-app-timedreboot:luci-app-timedreboot
-            luci-app-guest-wifi:luci-app-guest-wifi
-            luci-app-wolplus:luci-app-wolplus
-            luci-app-socat:luci-app-socat
+            ookla-speedtest:./
+            luci-app-turboacc:./
+            shortcut-fe:./
+            luci-app-easytier:./
+            easytier:./
+            luci-app-taskplan:./
+            luci-app-timedreboot:./
+            luci-app-wolplus:./
+            luci-app-socat:./
           # ----------------
         run: |
           echo "🚜 启动临时文件夹..."
