@@ -45,6 +45,9 @@ jobs:
             easytier:easytier
             luci-app-taskplan:luci-app-taskplan
             luci-app-timedreboot:luci-app-timedreboot
+            luci-app-guest-wifi:luci-app-guest-wifi
+            luci-app-wolplus:luci-app-wolplus
+            luci-app-socat:luci-app-socat
           # ----------------
         run: |
           echo "🚜 启动临时文件夹..."
