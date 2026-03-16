@@ -37,7 +37,7 @@ jobs:
             luci-app-wrtbwmon:luci-app-wrtbwmon
             wrtbwmon:wrtbwmon
             luci-app-netspeedtest:luci-app-netspeedtest
-            homebox:homebox
+            homebox:./
             ookla-speedtest:ookla-speedtest
             luci-app-turboacc:luci-app-turboacc
             shortcut-fe:shortcut-fe
