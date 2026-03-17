@@ -47,6 +47,7 @@ jobs:
             luci-app-timedreboot:./
             luci-app-wolplus:./
             luci-app-socat:./
+            luci-app-passwall:./
           # ----------------
         run: |
           echo "🚜 启动临时文件夹..."
