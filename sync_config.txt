@@ -62,11 +62,11 @@ luci-app-easytier:luci
 easytier:luci
 
 # --------- kucat主题 --------
-REPO:https://github.com/sirpdboy/luci-theme-kucat.git:main
+REPO:https://github.com/sirpdboy/luci-theme-kucat.git:master
 ./:luci/luci-theme-kucat
 
 # --------- kucat主题 --------
-REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:main
+REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:master
 ./:luci/luci-app-kucat-config
 
 # --------- n2n --------
