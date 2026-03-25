@@ -36,10 +36,20 @@ jobs:
             luci-app-wrtbwmon:./
             wrtbwmon:./
             luci-app-netspeedtest:./
+            homebox:./
+            ookla-speedtest:./
+            luci-app-turboacc:./
+            shortcut-fe:./
+            luci-app-easytier:./
+            easytier:./
+            luci-app-taskplan:./
+            luci-app-timedreboot:./
+            luci-app-wolplus:./
+            luci-app-socat:./
             
-            REPO:https://github.com/immortalwrt/luci.git:openwrt-23.05
-            applications/luci-app-turboacc:package/lean/luci-app-turboacc
-            applications/luci-app-easytier:package/lean/luci-app-easytier
+            REPO:https://github.com/sbwml/luci-theme-argon:openwrt-25.12
+            luci-app-argon-config:./
+            luci-theme-argon:./
             
             REPO:https://github.com/coolsnowwolf/lede.git:master
             package/lean/luci-app-socat:package/lean/luci-app-socat
