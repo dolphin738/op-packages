@@ -5,91 +5,92 @@
 
 # --- kiddin9/op-packages ---
 REPO:https://github.com/kiddin9/op-packages.git:main
-luci-app-adguardhome:./
-luci-app-wrtbwmon:./
-wrtbwmon:./
-homebox:./
-ookla-speedtest:./
-luci-app-turboacc:./
-shortcut-fe:./
-luci-app-taskplan:./
-luci-app-timedreboot:./
-luci-app-wolplus:./
-luci-app-socat:./
+luci-app-adguardhome:luci
+luci-app-wrtbwmon:luci
+wrtbwmon:luci
+homebox:luci
+ookla-speedtest:luci
+luci-app-turboacc:luci
+shortcut-fe:luci
+luci-app-taskplan:luci
+luci-app-timedreboot:luci
+luci-app-wolplus:luci
+luci-app-socat:luci
 
 # --------- VIKINGYFY --------
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
-./:luci-app-homeproxy
+./:luci/luci-app-homeproxy
 
 # --------- immortalwrt-luci --------
 REPO:https://github.com/immortalwrt/luci.git:master
-applications/luci-app-adblock-fast:./
-applications/luci-app-diskman:./
-applications/luci-app-n2n:./
-applications/luci-app-smartdns:./
-applications/luci-app-syncthing:./
-applications/luci-app-watchcat:./
-applications/luci-app-wechatpush:./
+applications/luci-app-adblock-fast:luci
+applications/luci-app-diskman:luci
+applications/luci-app-n2n:luci
+applications/luci-app-smartdns:luci
+applications/luci-app-syncthing:luci
+applications/luci-app-watchcat:luci
+applications/luci-app-wechatpush:luci
 
 # --------- immortalwrt-packages --------
 REPO:https://github.com/immortalwrt/packages.git:master
-net/n2n:./
-net/smartdns:./
-utils/syncthing:./
-utils/watchcat:./
+net/n2n:luci
+net/smartdns:luci
+utils/syncthing:luci
+utils/watchcat:luci
 
 # --------- argon主题 --------
 REPO:https://github.com/sbwml/luci-theme-argon.git:openwrt-25.12
-luci-app-argon-config:./
-luci-theme-argon:./
+luci-app-argon-config:luci
+luci-theme-argon:luci
 
 # --------- openwrt-bandix --------
 REPO:https://github.com/timsaya/openwrt-bandix.git:main
-openwrt-bandix:./
+openwrt-bandix:luci
 
 # --------- luci-app-bandix --------
 REPO:https://github.com/timsaya/luci-app-bandix.git:main
-luci-app-bandix:./
+luci-app-bandix:luci
 
 # --------- ddns-go --------
 REPO:https://github.com/sirpdboy/luci-app-ddns-go.git:main
-luci-app-ddns-go:./
-ddns-go:./
+luci-app-ddns-go:luci
+ddns-go:luci
 
 # --------- easytier --------
 REPO:https://github.com/EasyTier/luci-app-easytier.git:main
-luci-app-easytier:./
-easytier:./
+luci-app-easytier:luci
+easytier:luci
 
 # --------- kucat主题 --------
 REPO:https://github.com/sirpdboy/luci-theme-kucat.git:main
-./:luci-theme-kucat
+./:luci/luci-theme-kucat
 
 # --------- kucat主题 --------
 REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:main
-./:luci-app-kucat-config
+./:luci/luci-app-kucat-config
 
 # --------- n2n --------
 REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:main
-./:luci-app-kucat-config
+./:luci/luci-app-kucat-config
 
 # --------- netspeedtest --------
 REPO:https://github.com/sirpdboy/netspeedtest.git:main
-luci-app-netspeedtest:./
-homebox:./
-ookla-speedtest:./
+luci-app-netspeedtest:luci
+homebox:luci
+ookla-speedtest:luci
 
 # --------- quickfile --------
 REPO:https://github.com/sbwml/luci-app-quickfile.git:main
-luci-app-quickfile:./
-quickfile:./
+luci-app-quickfile:luci
+quickfile:luci
 
 # --------- rtp2httpd --------
 REPO:https://github.com/stackia/rtp2httpd.git:main
-openwrt-support/luci-app-rtp2httpd:./
-openwrt-support/rtp2httpd:./
+openwrt-support/luci-app-rtp2httpd:luci
+openwrt-support/rtp2httpd:luci
 
 # --------- rtp2httpd --------
 REPO:https://github.com/stackia/rtp2httpd.git:main
-openwrt-support/luci-app-rtp2httpd:./
-openwrt-support/rtp2httpd:./
+openwrt-support/luci-app-rtp2httpd:luci
+openwrt-support/rtp2httpd:luci
+
