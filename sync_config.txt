@@ -3,19 +3,33 @@
 # 2. 下方行定义文件映射: <源路径>:<目标路径>
 # 3. # 开头的行为注释，会被忽略
 
-# --- 来源 1: kiddin9/op-packages ---
+# --- kiddin9/op-packages ---
 REPO:https://github.com/kiddin9/op-packages.git:main
 luci-app-adguardhome:./
 luci-app-wrtbwmon:./
 wrtbwmon:./
 luci-app-netspeedtest:./
+homebox:./
+ookla-speedtest:./
+luci-app-turboacc:./
+shortcut-fe:./
+luci-app-easytier:./
+easytier:./
+luci-app-taskplan:./
+luci-app-timedreboot:./
+luci-app-wolplus:./
+luci-app-socat:./
 
-# --- 来源 2: immortalwrt/luci ---
-REPO:https://github.com/immortalwrt/luci.git:openwrt-23.05
-applications/luci-app-turboacc:package/lean/luci-app-turboacc
-applications/luci-app-easytier:package/lean/luci-app-easytier
+# --------- VIKINGYFY --------
+REPO:https://github.com/VIKINGYFY/homeproxy:main
+./:luci-app-homeproxy
 
-# --- 来源 3: coolsnowwolf/lede ---
-REPO:https://github.com/coolsnowwolf/lede.git:master
-package/lean/luci-app-socat:package/lean/luci-app-socat
-package/lean/luci-app-taskplan:package/lean/luci-app-taskplan
+# --------- aurora主题 --------
+REPO:https://github.com/eamonxg/luci-theme-aurora:openwrt-25.12
+luci-app-argon-config:./
+luci-theme-argon:./
+
+# --------- argon主题 --------
+REPO:https://github.com/sbwml/luci-theme-argon:openwrt-25.12
+luci-app-argon-config:./
+luci-theme-argon:./
