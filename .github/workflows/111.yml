@@ -2,9 +2,7 @@ name: Sync op-packages from Multiple Upstreams
 
 on:
   schedule:
-    # 每天 UTC 00:00 (北京时间 08:00)
     - cron: '0 0 * * *'
-  
   workflow_dispatch:
 
 jobs:
@@ -16,78 +14,56 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
+          # 确保检出配置文件，默认就是全部检出，这里显式写出以防万一
+          # 如果仓库很大，可以考虑只 checkout 需要的文件，但通常全量 checkout 也没问题
 
       - name: 配置 Git 用户信息
         run: |
           git config --global user.name "dolphin738"
           git config --global user.email "dolphin738@sina.com"
 
-      - name: 同步多源插件
+      - name: 读取配置并同步多源插件
         env:
-          # --- 配置区域开始 ---
-          # 格式说明:
-          # 1. 以 "REPO:" 开头定义一个新仓库，格式: REPO:<上游URL>:<分支名>
-          # 2. 紧接着的行定义该仓库的文件映射，格式: <上游相对路径>:<本地目标路径>
-          # 3. 不同仓库之间用空行或直接写下一个 REPO: 分隔
-          
-          SYNC_CONFIG: |
-            REPO:https://github.com/kiddin9/op-packages.git:main
-            luci-app-adguardhome:./
-            luci-app-wrtbwmon:./
-            wrtbwmon:./
-            luci-app-netspeedtest:./
-            homebox:./
-            ookla-speedtest:./
-            luci-app-turboacc:./
-            shortcut-fe:./
-            luci-app-easytier:./
-            easytier:./
-            luci-app-taskplan:./
-            luci-app-timedreboot:./
-            luci-app-wolplus:./
-            luci-app-socat:./
-            
-            REPO:https://github.com/sbwml/luci-theme-argon:openwrt-25.12
-            luci-app-argon-config:./
-            luci-theme-argon:./
-            
-            REPO:https://github.com/coolsnowwolf/lede.git:master
-            package/lean/luci-app-socat:package/lean/luci-app-socat
-            package/lean/luci-app-taskplan:package/lean/luci-app-taskplan
-          # --- 配置区域结束 ---
+          CONFIG_FILE: "sync_config.txt" # 配置文件路径
         run: |
-          echo "🚜 开始多源同步任务..."
+          # 检查配置文件是否存在
+          if [ ! -f "$CONFIG_FILE" ]; then
+            echo "❌ Error: Configuration file '$CONFIG_FILE' not found!"
+            exit 1
+          fi
+
+          echo "📄 读取配置文件: $CONFIG_FILE"
           
           CURRENT_REPO_URL=""
           CURRENT_REPO_BRANCH=""
-          TEMP_DIR="/tmp/upstream_src_$$" # 使用进程ID避免冲突
+          TEMP_DIR="/tmp/upstream_src_$$"
           CHANGED=false
           
-          # 读取配置每一行
-          while IFS= read -r line; do
+          # 逐行读取本地文件
+          while IFS= read -r line || [ -n "$line" ]; do
             # 去除首尾空格
             line=$(echo "$line" | xargs)
             
-            # 跳过空行
+            # 跳过空行和注释行 (# 开头)
             [ -z "$line" ] && continue
+            [[ "$line" == \#* ]] && continue
             
             # 检查是否是新的仓库定义
             if [[ "$line" == REPO:* ]]; then
-              # 如果之前有正在处理的仓库，先清理临时目录
+              # 清理上一个仓库的临时目录
               if [ -n "$CURRENT_REPO_URL" ] && [ -d "$TEMP_DIR" ]; then
                 rm -rf "$TEMP_DIR"
               fi
               
-              # 解析新仓库信息: REPO:URL:BRANCH
-              # 使用参数扩展切割字符串
+              # 解析: REPO:URL:BRANCH
               raw_data="${line#REPO:}"
-              CURRENT_REPO_URL="${raw_data%:*}"   # 去掉最后一个冒号后的内容作为分支
-              CURRENT_REPO_BRANCH="${raw_data##*:}" # 取最后一个冒号后的内容作为分支
+              CURRENT_REPO_URL="${raw_data%:*}"
+              CURRENT_REPO_BRANCH="${raw_data##*:}"
               
               echo "----------------------------------------"
               echo "📦 切换上游仓库: $CURRENT_REPO_URL (分支: $CURRENT_REPO_BRANCH)"
               
-              # 浅克隆当前仓库
+              # 浅克隆
               if ! git clone --depth 1 --branch "$CURRENT_REPO_BRANCH" "$CURRENT_REPO_URL" "$TEMP_DIR" 2>/dev/null; then
                 echo "❌ Error: Failed to clone $CURRENT_REPO_URL"
                 exit 1
@@ -95,10 +71,10 @@ jobs:
               continue
             fi
             
-            # 如果不是 REPO 开头，且当前没有激活的仓库，说明配置错误
+            # 验证当前是否有激活的仓库
             if [ -z "$CURRENT_REPO_URL" ]; then
-              echo "❌ Error: File mapping defined before any REPO declaration: $line"
-              exit 1
+              echo "⚠️ Warning: File mapping found before any REPO declaration, skipping: $line"
+              continue
             fi
             
             # 处理文件映射: SRC:DST
@@ -106,32 +82,28 @@ jobs:
               src_path="${line%%:*}"
               dest_path="${line#*:}"
               
-              # 再次去除可能的空格
+              # 去除空格
               src_path=$(echo "$src_path" | xargs)
               dest_path=$(echo "$dest_path" | xargs)
               
               echo "🔍 检查: [$src_path] -> [$dest_path]"
               
-              # 检查源文件是否存在
               if [ ! -e "$TEMP_DIR/$src_path" ]; then
                 echo "⚠️ Warning: Source not found in $CURRENT_REPO_URL: $src_path (Skipping...)"
                 continue
               fi
               
-              # 创建目标目录
               mkdir -p "$(dirname "$dest_path")"
-              
-              # 复制 (覆盖)
               cp -r "$TEMP_DIR/$src_path" "$dest_path"
               echo "✅ 已同步: $src_path"
               CHANGED=true
             else
-              echo "⚠️ Warning: Invalid line format (not REPO: or SRC:DST): $line"
+              echo "⚠️ Warning: Invalid line format: $line"
             fi
             
-          done <<< "$SYNC_CONFIG"
+          done < "$CONFIG_FILE" # < 符号表示从文件重定向输入，而不是 <<< 字符串
           
-          # 清理最后一个仓库的临时目录
+          # 清理最后的临时目录
           if [ -d "$TEMP_DIR" ]; then
             rm -rf "$TEMP_DIR"
           fi
@@ -145,7 +117,6 @@ jobs:
 
       - name: 提交并推送
         run: |
-          # 检查是否有变更
           if [ -z "$(git status --porcelain)" ]; then
             echo "✨ No changes detected. Everything is up to date."
             exit 0
@@ -153,6 +124,7 @@ jobs:
           
           echo "🚀 Changes detected. Committing..."
           git add .
+          # 提交信息中包含配置文件的变化可能更有意义，但这里保持通用
           git commit -m "chore(auto-sync): update files from multiple upstreams
         
           Synced via GitHub Actions
