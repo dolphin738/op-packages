@@ -21,15 +21,37 @@ luci-app-wolplus:./
 luci-app-socat:./
 
 # --------- VIKINGYFY --------
-REPO:https://github.com/VIKINGYFY/homeproxy:main
+REPO:https://github.com/VIKINGYFY/homeproxy.git:main
 ./:luci-app-homeproxy
 
-# --------- aurora主题 --------
-REPO:https://github.com/eamonxg/luci-theme-aurora:openwrt-25.12
+# --------- immortalwrt --------
+REPO:https://github.com/immortalwrt/luci.git:master
+applications/luci-app-adblock-fast:./
+applications/luci-app-diskman:./
+
+# --------- argon主题 --------
+REPO:https://github.com/sbwml/luci-theme-argon.git:openwrt-25.12
 luci-app-argon-config:./
 luci-theme-argon:./
 
-# --------- argon主题 --------
-REPO:https://github.com/sbwml/luci-theme-argon:openwrt-25.12
-luci-app-argon-config:./
-luci-theme-argon:./
+# --------- openwrt-bandix --------
+REPO:https://github.com/timsaya/openwrt-bandix.git:main
+openwrt-bandix:./
+
+# --------- luci-app-bandix --------
+REPO:https://github.com/timsaya/luci-app-bandix.git:main
+luci-app-bandix:./
+
+# --------- ddns-go --------
+REPO:https://github.com/sirpdboy/luci-app-ddns-go.git:main
+luci-app-ddns-go:./
+ddns-go:./
+
+# --------- easytier --------
+REPO:https://github.com/EasyTier/luci-app-easytier.git:main
+luci-app-easytier:./
+easytier:./
+
+# --------- kucat主题 --------
+REPO:https://github.com/sirpdboy/luci-theme-kucat.git:main
+./:/luci-theme-kucat
