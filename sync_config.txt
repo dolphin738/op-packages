@@ -69,10 +69,6 @@ REPO:https://github.com/sirpdboy/luci-theme-kucat.git:master
 REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:master
 ./:luci/luci-app-kucat-config
 
-# --------- n2n --------
-REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:main
-./:luci/luci-app-kucat-config
-
 # --------- netspeedtest --------
 REPO:https://github.com/sirpdboy/netspeedtest.git:main
 luci-app-netspeedtest:luci
