@@ -65,7 +65,7 @@ easytier:luci
 REPO:https://github.com/sirpdboy/luci-theme-kucat.git:master
 ./:luci/luci-theme-kucat
 
-# --------- kucat主题 --------
+# --------- kucat-config --------
 REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:master
 ./:luci/luci-app-kucat-config
 
