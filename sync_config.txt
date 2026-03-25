@@ -19,7 +19,7 @@ luci-app-socat:luci
 
 # --------- VIKINGYFY --------
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
-./:luci/luci-app-homeproxy
+./:luci/luci-app-homeproxy/
 
 # --------- immortalwrt-luci --------
 REPO:https://github.com/immortalwrt/luci.git:master
@@ -63,11 +63,11 @@ easytier:luci
 
 # --------- kucat主题 --------
 REPO:https://github.com/sirpdboy/luci-theme-kucat.git:master
-./:luci/luci-theme-kucat
+./:luci/luci-theme-kucat/
 
 # --------- kucat-config --------
 REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:master
-./:luci/luci-app-kucat-config
+./:luci/luci-app-kucat-config/
 
 # --------- netspeedtest --------
 REPO:https://github.com/sirpdboy/netspeedtest.git:main
