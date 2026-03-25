@@ -8,13 +8,10 @@ REPO:https://github.com/kiddin9/op-packages.git:main
 luci-app-adguardhome:./
 luci-app-wrtbwmon:./
 wrtbwmon:./
-luci-app-netspeedtest:./
 homebox:./
 ookla-speedtest:./
 luci-app-turboacc:./
 shortcut-fe:./
-luci-app-easytier:./
-easytier:./
 luci-app-taskplan:./
 luci-app-timedreboot:./
 luci-app-wolplus:./
@@ -24,10 +21,22 @@ luci-app-socat:./
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
 ./:luci-app-homeproxy
 
-# --------- immortalwrt --------
+# --------- immortalwrt-luci --------
 REPO:https://github.com/immortalwrt/luci.git:master
 applications/luci-app-adblock-fast:./
 applications/luci-app-diskman:./
+applications/luci-app-n2n:./
+applications/luci-app-smartdns:./
+applications/luci-app-syncthing:./
+applications/luci-app-watchcat:./
+applications/luci-app-wechatpush:./
+
+# --------- immortalwrt-packages --------
+REPO:https://github.com/immortalwrt/packages.git:master
+net/n2n:./
+net/smartdns:./
+utils/syncthing:./
+utils/watchcat:./
 
 # --------- argon主题 --------
 REPO:https://github.com/sbwml/luci-theme-argon.git:openwrt-25.12
@@ -54,4 +63,33 @@ easytier:./
 
 # --------- kucat主题 --------
 REPO:https://github.com/sirpdboy/luci-theme-kucat.git:main
-./:/luci-theme-kucat
+./:luci-theme-kucat
+
+# --------- kucat主题 --------
+REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:main
+./:luci-app-kucat-config
+
+# --------- n2n --------
+REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:main
+./:luci-app-kucat-config
+
+# --------- netspeedtest --------
+REPO:https://github.com/sirpdboy/netspeedtest.git:main
+luci-app-netspeedtest:./
+homebox:./
+ookla-speedtest:./
+
+# --------- quickfile --------
+REPO:https://github.com/sbwml/luci-app-quickfile.git:main
+luci-app-quickfile:./
+quickfile:./
+
+# --------- rtp2httpd --------
+REPO:https://github.com/stackia/rtp2httpd.git:main
+openwrt-support/luci-app-rtp2httpd:./
+openwrt-support/rtp2httpd:./
+
+# --------- rtp2httpd --------
+REPO:https://github.com/stackia/rtp2httpd.git:main
+openwrt-support/luci-app-rtp2httpd:./
+openwrt-support/rtp2httpd:./
