@@ -1,9 +1,15 @@
 name: Compile Luci Plugin
 
+#on:
+  #push:
+    #branches: [ main, master ] # 当推送到 main 或 master 分支时触发
+  #workflow_dispatch: # 允许手动触发
 on:
+  workflow_dispatch:
   push:
-    branches: [ main, master ] # 当推送到 main 或 master 分支时触发
-  workflow_dispatch: # 允许手动触发
+    paths:
+      - 'luci/**'           # 当 luci 文件夹内容变动时触发
+      - '.github/**'
 
 jobs:
   compile:
