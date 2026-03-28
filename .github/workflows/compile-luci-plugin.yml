@@ -1,0 +1,75 @@
+name: Compile Luci Plugin
+
+on:
+  push:
+    branches: [ main, master ] # 当推送到 main 或 master 分支时触发
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # 定义多架构配置
+        # 请根据实际需求修改或添加 SDK URL 和对应的架构名称
+        sdk:
+          - url: https://downloads.immortalwrt.org/snapshots/targets/qualcommax/ipq60xx/immortalwrt-sdk-qualcommax-ipq60xx_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+            name: qualcommax-ipq60xx
+          - url: https://downloads.immortalwrt.org/snapshots/targets/x86/64/immortalwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+            name: x86-64
+          - url: https://downloads.immortalwrt.org/snapshots/targets/mediatek/mt7622/immortalwrt-sdk-mediatek-mt7622_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+            name: mediatek-mt7622
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install Build Dependencies (Official Script)
+      run: |
+        wget -q https://build-scripts.immortalwrt.org/init_build_environment.sh -O init_build_environment.sh
+        chmod +x init_build_environment.sh
+        sudo ./init_build_environment.sh
+
+    - name: Download SDK - ${{ matrix.sdk.name }}
+      run: |
+        wget -q ${{ matrix.sdk.url }} -O sdk.tar.zst
+        tar --zstd -xf sdk.tar.zst
+        mv immortalwrt-sdk-* sdk
+        cd sdk
+        ./scripts/feeds update -a
+
+    - name: Copy Plugin Source
+      # 将仓库根目录下的 "luci" 文件夹复制到 SDK 的 package 目录中
+      run: |
+        cp -r luci sdk/package/
+
+    - name: Update Feeds
+      run: |
+        cd sdk
+        ./scripts/feeds install -a
+
+    - name: Configure and Compile
+      run: |
+        cd sdk
+        # 使用命令行配置，仅编译 LuCI 项目下的所有插件
+        echo "CONFIG_ALL=y" >> .config
+        echo "CONFIG_TARGET_IMAGES_GZIP=y" >> .config
+        # 这里使用 -j$(nproc) 自动匹配 CPU 核心数进行加速
+        make -j$(nproc) package/feeds/packages/luci
+
+    - name: Organize Output Files
+      # 修改部分：将整个 bin/packages 目录复制到 APK 架构文件夹中
+      run: |
+        # 创建目标目录：APK/[架构名]
+        mkdir -p APK/${{ matrix.sdk.name }}
+        
+        # 将 SDK 中 bin/packages 下的所有内容（所有子文件夹和文件）复制到目标目录
+        # 使用 cp -r 递归复制，保留目录结构
+        cp -r sdk/bin/packages/* APK/${{ matrix.sdk.name }}/
+
+    - name: Commit Results
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        file_pattern: APK/
+        commit_message: Auto compile ${{ matrix.sdk.name }} full package repository
+        branch: ${{ github.head_ref || github.ref_name }}
