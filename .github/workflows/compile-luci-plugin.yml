@@ -1,4 +1,4 @@
-name: Build Luci Apps
+name: Build Luci Apps (ImmortalWrt SDK Multi-Arch)
 
 on:
   # 1. 手动触发配置
