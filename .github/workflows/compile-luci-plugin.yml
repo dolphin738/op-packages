@@ -58,8 +58,8 @@ jobs:
       run: |
         cd sdk
         # 使用命令行配置，仅编译 LuCI 项目下的所有插件
-        echo "CONFIG_ALL=y" >> .config
-        echo "CONFIG_TARGET_IMAGES_GZIP=y" >> .config
+        #echo "CONFIG_ALL=y" >> .config
+        #echo "CONFIG_TARGET_IMAGES_GZIP=y" >> .config
         # 这里使用 -j$(nproc) 自动匹配 CPU 核心数进行加速
         make -j$(nproc) package/feeds/packages/luci
 
