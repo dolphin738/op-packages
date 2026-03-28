@@ -1,8 +1,8 @@
 name: Sync op-packages from Multiple Upstreams
 
 on:
- schedule:
-    - cron: '0 0 * * *'
+ #schedule:
+    #- cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
@@ -21,7 +21,6 @@ jobs:
         run: |
           git config --global user.name "dolphin738"
           git config --global user.email "dolphin738@sina.com"
-
       - name: 读取配置并同步多源插件
         env:
           CONFIG_FILE: "sync_config.txt" # 配置文件路径
@@ -31,7 +30,6 @@ jobs:
             echo "❌ Error: Configuration file '$CONFIG_FILE' not found!"
             exit 1
           fi
-
           echo "📄 读取配置文件: $CONFIG_FILE"
           
           CURRENT_REPO_URL=""
@@ -114,7 +112,6 @@ jobs:
           else
             echo "ℹ️ 所有源处理完毕，未检测到文件变更。"
           fi
-
       - name: 提交并推送
         run: |
           if [ -z "$(git status --porcelain)" ]; then
