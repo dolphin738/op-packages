@@ -1,4 +1,4 @@
-name: Build Luci Apps 
+name: Build Luci Apps (ImmortalWrt SDK Multi-Arch - Official Paths)
 
 on:
   workflow_dispatch:
@@ -115,33 +115,28 @@ jobs:
               fi
             fi
           done
-
-      #- name: Upload Artifacts
-        #uses: actions/upload-artifact@v4
-        #with:
-          #name: luci-plugins-${{ matrix.target }}
-          #path: bin/packages/**/*.ipk
-          #retention-days: 7
-	
-	  - name: Prepare Artifacts (Archive All)
-        run: |
-          echo "📦 准备上传产物..."
-          # 创建一个临时目录用于整理，或者直接上传 bin 目录
-          # 为了保持目录结构清晰，我们直接操作 bin 目录
+		  
+       - name: Prepare Artifacts (Archive All)
+         run: |
+           echo "📦 准备上传产物..."
+           # 创建一个临时目录用于整理，或者直接上传 bin 目录
+           # 为了保持目录结构清晰，我们直接操作 bin 目录
           
-          # 显示即将上传的内容结构
-          echo "📂 产物目录结构预览:"
-          find bin/packages -type f -name "*.ipk" | head -n 20
-          echo "..."
+           # 显示即将上传的内容结构
+           echo "📂 产物目录结构预览:"
+           find bin/packages -type f -name "*.ipk" | head -n 20
+           echo "..."
           
-          # 如果需要上传到特定的 "APK" 文件夹结构，可以在这里重命名
-          # 但通常直接上传 bin 目录最稳妥，因为它包含了 Packages 索引文件
+           # 如果需要上传到特定的 "APK" 文件夹结构，可以在这里重命名
+           # 但通常直接上传 bin 目录最稳妥，因为它包含了 Packages 索引文件
 
-      - name: Upload to Repository (APK Folder)
-        uses: actions/upload-artifact@v4
-        with:
-          # 这里的名称将作为压缩包的名字，下载解压后即为你需要的文件夹结构
-          name: APK-${{ matrix.target }}
-          # 上传整个 bin 目录，这包含了 packages 下的所有子文件夹、ipk 文件和索引
-          path: bin/packages/
-          retention-days: 30
+       - name: Upload to Repository (APK Folder)
+         uses: actions/upload-artifact@v4
+         with:
+           # 这里的名称将作为压缩包的名字，下载解压后即为你需要的文件夹结构
+           name: APK-${{ matrix.target }}
+           # 上传整个 bin 目录，这包含了 packages 下的所有子文件夹、ipk 文件和索引
+           path: bin/
+           retention-days: 30
+
+
