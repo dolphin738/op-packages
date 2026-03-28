@@ -1,20 +1,23 @@
 name: Build Luci Apps
 
 on:
+  # 1. 手动触发配置
   workflow_dispatch:
     inputs:
       build_type:
-        description: '选择构建类型'
+        description: '📦 选择构建类型'
         required: true
         default: 'snapshots'
         type: choice
         options:
-          - 'snapshots'
-          # 如果以后需要支持 releases，可以在这里添加逻辑
+          - snapshots
+          # - releases  <-- 未来若需支持 releases 构建，取消此行注释即可
+
+  # 2. 自动触发配置
   push:
     paths:
-      - 'luci/**'
-      - '.github/workflows/**'
+      - 'luci/**'          # 监听 luci 目录下的所有改动
+      #- '.github/**'       # 监听工作流文件本身的改动
 
 jobs:
   build:
