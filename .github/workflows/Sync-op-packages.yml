@@ -1,4 +1,4 @@
-name: Sync op-packages from Multiple Upstreams
+name: Sync op-packages
 
 on:
  #schedule:
