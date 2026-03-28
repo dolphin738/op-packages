@@ -1,4 +1,4 @@
-name: Build Luci Apps (ImmortalWrt SDK Multi-Arch - Official Paths)
+name: Build Luci Apps 
 
 on:
   workflow_dispatch:
