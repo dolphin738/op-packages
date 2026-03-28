@@ -119,11 +119,16 @@ jobs:
             fi
            done
 
-       - name: Organize Output Files
-         run: |
-           mkdir -p APK/${{ matrix.sdk.name }}   
-           cp -r sdk/bin/packages/* APK/${{ matrix.sdk.name }}/
-
+      - name: Organize Output Files
+        run: |
+          mkdir -p APK/${{ matrix.target }}   # 创建目标目录：APK/[架构名]
+          cp -r sdk/bin/packages/* APK/${{ matrix.target }}/  # 将 SDK 中 bin/packages 下的所有内容（所有子文件夹和文件）复制到目标目录# 使用 cp -r 递归复制，保留目录结构
+      - name: Commit Results
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: APK/
+          commit_message: Auto compile ${{ matrix.target }} full package repository
+          branch: ${{ github.head_ref || github.ref_name }}
 #- name: Upload Artifacts
        #uses: actions/upload-artifact@v4
        #with:
