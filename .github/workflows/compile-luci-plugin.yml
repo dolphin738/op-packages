@@ -1,4 +1,4 @@
-name: Build Luci Apps (ImmortalWrt SDK Multi-Arch - Official Paths)
+name: Build Luci Apps
 
 on:
   workflow_dispatch:
@@ -133,11 +133,11 @@ jobs:
       - name: Upload to Repository (APK Folder)
         uses: actions/upload-artifact@v4
         with:
-           # 这里的名称将作为压缩包的名字，下载解压后即为你需要的文件夹结构
-           name: APK-${{ matrix.target }}
-           # 上传整个 bin 目录，这包含了 packages 下的所有子文件夹、ipk 文件和索引
-           path: bin/
-           retention-days: 30
+          # 这里的名称将作为压缩包的名字，下载解压后即为你需要的文件夹结构
+          name: APK-${{ matrix.target }}
+          # 上传整个 bin 目录，这包含了 packages 下的所有子文件夹、ipk 文件和索引
+          path: bin/packages/
+          retention-days: 30
 		   
 	 #- name: Upload Artifacts
        #uses: actions/upload-artifact@v4
