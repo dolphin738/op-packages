@@ -1,0 +1,147 @@
+name: Build Luci Apps (ImmortalWrt SDK Multi-Arch - Official Paths)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: '选择构建类型'
+        required: true
+        default: 'snapshots'
+        type: choice
+        options:
+          - 'snapshots'
+          # 如果以后需要支持 releases，可以在这里添加逻辑
+  push:
+    paths:
+      - 'luci/**'
+      - '.github/workflows/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 根据官方 URL 规则定义：subdir/target
+          # x86_64
+          - target: x86_64
+            subdir: x86
+            target_dir: 64
+            
+          # Qualcommax IPQ60xx
+          - target: qualcommax_ipq60xx
+            subdir: qualcommax
+            target_dir: ipq60xx
+            
+          # Mediatek MT7622
+          - target: mediatek_mt7622
+            subdir: mediatek
+            target_dir: mt7622
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Build Environment
+        run: |
+          echo "🚀 正在安装基础依赖..."
+          # 安装基础编译环境
+          curl -sSL https://build-scripts.immortalwrt.org/init_build_environment.sh -o init_env.sh
+          chmod +x init_env.sh
+          sudo ./init_env.sh
+          rm -f init_env.sh
+          
+          # 安装 zstd 解压工具 (SDK 使用 .zst 格式)
+          sudo apt-get install -y ccache zstd
+
+      - name: Download ImmortalWrt SDK
+        run: |
+          BUILD_TYPE=${{ github.event.inputs.build_type }}
+          
+          # 根据矩阵参数构建 URL
+          # 示例: https://downloads.immortalwrt.org/snapshots/targets/x86/64/immortalwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+          if [ "$BUILD_TYPE" = "snapshots" ]; then
+            BASE_URL="https://downloads.immortalwrt.org/snapshots"
+            # 注意：文件名中的 target 需要将目录结构连接起来 (x86/64 -> x86-64)
+            FILE_TARGET_NAME=$(echo "${{ matrix.subdir }}-${{ matrix.target_dir }}" | sed 's/\//-/g')
+            DOWNLOAD_URL="${BASE_URL}/targets/${{ matrix.subdir }}/${{ matrix.target_dir }}/immortalwrt-sdk-${FILE_TARGET_NAME}_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
+          fi
+
+          echo "🔽 正在下载 SDK: $DOWNLOAD_URL"
+          wget -q $DOWNLOAD_URL -O sdk.tar.zst
+          
+          if [ ! -f sdk.tar.zst ]; then
+            echo "::error::SDK 下载失败，请检查网络或 URL 是否有效。"
+            exit 1
+          fi
+          
+          # 解压 .zst 文件
+          echo "📦 解压 SDK..."
+          # -T --xz 有时是必要的，但 tar 通常能自动识别
+          tar --zstd -xf sdk.tar.zst --strip-components=1
+          rm sdk.tar.zst
+          
+          # 初始化 feeds
+          echo "⚙️ 初始化 Feeds..."
+          ./scripts/feeds update -a
+
+      - name: Inject Local Luci Sources
+        run: |
+          if [ ! -d "luci" ]; then
+            echo "::error::找不到 luci 目录！请确保仓库根目录有 luci 文件夹。"
+            exit 1
+          fi
+          
+          mkdir -p package/custom-luci
+          cp -r luci/* package/custom-luci/
+          
+          echo "✅ 源码注入完成"
+
+      - name: Configure and Compile
+        run: |
+          # 生成默认配置
+          echo "CONFIG_CCACHE=y" >> .config
+          make defconfig
+
+          # 扫描插件并编译
+          echo "🔍 扫描并编译插件..."
+          for dir in package/custom-luci/*/; do
+            if [ -f "$dir/Makefile" ]; then
+              pkg_name=$(grep -oE 'PKG_NAME:=(.+)' "$dir/Makefile" | sed 's/PKG_NAME:=//' | head -n 1 | xargs)
+              if [ -n "$pkg_name" ]; then
+                echo "🔨 编译插件: $pkg_name"
+                make package/$pkg_name/compile V=s -j$(nproc) || echo "⚠️ $pkg_name 编译失败"
+              fi
+            fi
+          done
+
+      #- name: Upload Artifacts
+        #uses: actions/upload-artifact@v4
+        #with:
+          #name: luci-plugins-${{ matrix.target }}
+          #path: bin/packages/**/*.ipk
+          #retention-days: 7
+	
+	  - name: Prepare Artifacts (Archive All)
+        run: |
+          echo "📦 准备上传产物..."
+          # 创建一个临时目录用于整理，或者直接上传 bin 目录
+          # 为了保持目录结构清晰，我们直接操作 bin 目录
+          
+          # 显示即将上传的内容结构
+          echo "📂 产物目录结构预览:"
+          find bin/packages -type f -name "*.ipk" | head -n 20
+          echo "..."
+          
+          # 如果需要上传到特定的 "APK" 文件夹结构，可以在这里重命名
+          # 但通常直接上传 bin 目录最稳妥，因为它包含了 Packages 索引文件
+
+      - name: Upload to Repository (APK Folder)
+        uses: actions/upload-artifact@v4
+        with:
+          # 这里的名称将作为压缩包的名字，下载解压后即为你需要的文件夹结构
+          name: APK-${{ matrix.target }}
+          # 上传整个 bin 目录，这包含了 packages 下的所有子文件夹、ipk 文件和索引
+          path: bin/packages/
+          retention-days: 30
