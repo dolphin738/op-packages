@@ -6,9 +6,9 @@ name: 111Compile Luci Plugin
   #workflow_dispatch: # 允许手动触发
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'luci/**'           # 当 luci 文件夹内容变动时触发
+ # push:
+    #paths:
+     #- 'luci/**'           # 当 luci 文件夹内容变动时触发
      #- '.github/**'
 
 jobs:
