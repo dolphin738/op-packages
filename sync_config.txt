@@ -16,6 +16,9 @@ luci-app-taskplan:luci
 luci-app-timedreboot:luci
 luci-app-wolplus:luci
 luci-app-socat:luci
+luci-app-netspeedtest:luci
+homebox:luci
+ookla-speedtest:luci
 
 # --------- VIKINGYFY --------
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
@@ -70,10 +73,10 @@ REPO:https://github.com/sirpdboy/luci-app-kucat-config.git:master
 ./:luci/luci-app-kucat-config/
 
 # --------- netspeedtest --------
-REPO:https://github.com/sirpdboy/netspeedtest.git:main
-luci-app-netspeedtest:luci
-homebox:luci
-ookla-speedtest:luci
+#REPO:https://github.com/sirpdboy/netspeedtest.git:main
+#luci-app-netspeedtest:luci
+#homebox:luci
+#ookla-speedtest:luci
 
 # --------- quickfile --------
 REPO:https://github.com/sbwml/luci-app-quickfile.git:main
