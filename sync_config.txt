@@ -90,3 +90,8 @@ REPO:https://github.com/stackia/rtp2httpd.git:main
 openwrt-support/luci-app-rtp2httpd:luci
 openwrt-support/rtp2httpd:luci
 
+# --------- mosdns --------
+REPO:https://github.com/sbwml/luci-app-mosdns.git:v5
+luci-app-mosdns:luci
+mosdns:luci
+
