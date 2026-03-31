@@ -14,9 +14,9 @@ on:
           # - releases  <-- 未来若需支持 releases 构建，取消此行注释即可
 
   # 2. 自动触发配置
-  push:
-    paths:
-      - 'luci/**'          # 监听 luci 目录下的所有改动
+  #push:
+    #paths:
+      #- 'luci/**'          # 监听 luci 目录下的所有改动
       #- '.github/**'       # 监听工作流文件本身的改动
 
 jobs:
