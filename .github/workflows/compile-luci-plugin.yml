@@ -125,7 +125,7 @@ jobs:
           #mkdir -p APK/${{ matrix.target }}   # 创建目标目录：APK/[架构名]
           mkdir -p APK
           ls /bin
-          cp -r /bin/* APK/  #${{ matrix.target }}/   #将 SDK 中 bin/packages 下的所有内容（所有子文件夹和文件）复制到目标目录# 使用 cp -r 递归复制，保留目录结构
+          cp -r /bin/* APK/
           
       - name: 提交文件
         uses: stefanzweifel/git-auto-commit-action@v4
