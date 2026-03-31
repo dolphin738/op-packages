@@ -27,7 +27,6 @@ REPO:https://github.com/VIKINGYFY/homeproxy.git:main
 # --------- immortalwrt-luci --------
 REPO:https://github.com/immortalwrt/luci.git:master
 applications/luci-app-adblock-fast:luci
-applications/luci-app-diskman:luci
 applications/luci-app-n2n:luci
 applications/luci-app-smartdns:luci
 applications/luci-app-syncthing:luci
