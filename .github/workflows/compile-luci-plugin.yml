@@ -121,12 +121,23 @@ jobs:
           make defconfig
 
           # 直接编译整个 package/custom-luci 目录下的所有内容，比解析 Makefile 更可靠
-          echo "🔨 开始编译所有插件..."
-          make package/custom-luci/compile V=s -j$(nproc)
+          #echo "🔨 开始编译所有插件..."
+          #make package/custom-luci/compile V=s -j$(nproc)
+          # 扫描插件并编译
+          echo "🔍 扫描并编译插件..."
+          for dir in package/custom-luci/*/; do
+            if [ -f "$dir/Makefile" ]; then
+              pkg_name=$(grep -oE 'PKG_NAME:=(.+)' "$dir/Makefile" | sed 's/PKG_NAME:=//' | head -n 1 | xargs)
+              if [ -n "$pkg_name" ]; then
+                echo "🔨 编译插件: $pkg_name"
+                make package/$pkg_name/compile V=s -j$(nproc) || echo "⚠️ $pkg_name 编译失败"
+              fi
+            fi
+          done
 
           # 检查编译结果
           if [ ! -d "bin" ] || [ -z "$(ls -A bin)" ]; then
-            echo "::warning::编译完成，但未生成 bin 目录或目录为空。"
+            echo "::warning::编译完成，但未生成 bin 目录或目录为空。
           fi
 
       - name: 整理输出文件
