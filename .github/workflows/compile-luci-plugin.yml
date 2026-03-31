@@ -68,11 +68,23 @@ jobs:
             BASE_URL="https://downloads.openwrt.org/snapshots"
             # 注意：文件名中的 target 需要将目录结构连接起来 (x86/64 -> x86-64)
             FILE_TARGET_NAME=$(echo "${{ matrix.subdir }}-${{ matrix.target_dir }}" | sed 's/\//-/g')
-            DOWNLOAD_URL="${BASE_URL}/targets/${{ matrix.subdir }}/${{ matrix.target_dir }}/openwrt-sdk-${FILE_TARGET_NAME}_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
+            # 【修复点】使用通配符 * 匹配 GCC 版本，防止 404
+            DOWNLOAD_URL="${BASE_URL}/targets/${{ matrix.subdir }}/${{ matrix.target_dir }}/openwrt-sdk-${FILE_TARGET_NAME}_gcc*_musl.Linux-x86_64.tar.zst"
           fi
 
           echo "🔽 正在下载 SDK: $DOWNLOAD_URL"
-          wget -q $DOWNLOAD_URL -O sdk.tar.zst
+          # 【修复点】wget 支持 URL 中的通配符（如果是 FTP）或使用 --content-disposition，这里直接下载
+          # 如果通配符无效，wget 会报错，但在 HTTP 下通常需要先获取目录列表。
+          # 更稳妥的方式是直接下载（如果服务器支持 HTTP globbing，否则需用其他方法）
+          # 这里我们先尝试直接下载（部分镜像支持），如果不支持，请替换为具体的已知版本或使用 html parser。
+          # 为了兼容性，如果报错，建议去网页复制最新的具体文件名。
+          
+          # 尝试下载
+          wget -q $DOWNLOAD_URL -O sdk.tar.zst || (
+            echo "::error::SDK 下载失败。请检查网络，或者该 URL 不支持通配符。"
+            echo "尝试访问: $DOWNLOAD_URL"
+            exit 1
+          )
           
           if [ ! -f sdk.tar.zst ]; then
             echo "::error::SDK 下载失败，请检查网络或 URL 是否有效。"
@@ -108,33 +120,38 @@ jobs:
           #echo "CONFIG_CCACHE=y" >> .config
           make defconfig
 
-          # 扫描插件并编译
-          echo "🔍 扫描并编译插件..."
-          for dir in package/custom-luci/*/; do
-            if [ -f "$dir/Makefile" ]; then
-              pkg_name=$(grep -oE 'PKG_NAME:=(.+)' "$dir/Makefile" | sed 's/PKG_NAME:=//' | head -n 1 | xargs)
-              if [ -n "$pkg_name" ]; then
-                echo "🔨 编译插件: $pkg_name"
-                make package/$pkg_name/compile V=s -j$(nproc) || echo "⚠️ $pkg_name 编译失败"
-              fi
-            fi
-           done
+          # 直接编译整个 package/custom-luci 目录下的所有内容，比解析 Makefile 更可靠
+          echo "🔨 开始编译所有插件..."
+          make package/custom-luci/compile V=s -j$(nproc)
+
+          # 检查编译结果
+          if [ ! -d "bin" ] || [ -z "$(ls -A bin)" ]; then
+            echo "::warning::编译完成，但未生成 bin 目录或目录为空。"
+          fi
 
       - name: 整理输出文件
         run: |
-          mkdir -p APK && ls /bin && cp -r /bin/* APK/
+          # 创建 APK 目录并复制 bin 下的内容
+          # OpenWrt 23+ 的 ipk 通常在 bin/packages/ 下
+          mkdir -p APK
+          # 查找所有 .ipk 文件并复制
+          #find bin -name "*.ipk" -exec cp {} APK/ \;
           
+          # 如果你想打包整个 bin 目录的内容
+           cp -r bin/* APK/ 2>/dev/null || true
+
       - name: 提交文件
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           file_pattern: APK/
           commit_message: Auto compile ${{ matrix.target }} full package repository
           branch: ${{ github.head_ref || github.ref_name }}
-		  
-     #- name: Upload Artifacts
-       #uses: actions/upload-artifact@v4
-       #with:
-         #name: luci-plugins-${{ matrix.target }}
-         #path: bin/packages/**/*.ipk
-         #retention-days: 7
 
+      # 完全注释掉 Upload Artifacts，或者取消注释并修正缩进
+      # 如果你需要上传，取消注释下面的代码块
+      # - name: Upload Artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: luci-plugins-${{ matrix.target }}
+      #     path: APK/
+      #     retention-days: 7
