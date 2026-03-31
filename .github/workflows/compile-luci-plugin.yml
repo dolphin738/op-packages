@@ -122,7 +122,6 @@ jobs:
 
       - name: 整理输出文件
         run: |
-          #mkdir -p APK/${{ matrix.target }}   # 创建目标目录：APK/[架构名]
           mkdir -p APK
           ls /bin
           cp -r /bin/* APK/
