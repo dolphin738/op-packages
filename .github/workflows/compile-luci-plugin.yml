@@ -14,9 +14,9 @@ on:
           # - releases  <-- 未来若需支持 releases 构建，取消此行注释即可
 
   # 2. 自动触发配置
-  #push:
-    #paths:
-      #- 'luci/**'          # 监听 luci 目录下的所有改动
+  push:
+    paths:
+      - 'luci/**'          # 监听 luci 目录下的所有改动
       #- '.github/**'       # 监听工作流文件本身的改动
 
 jobs:
@@ -43,10 +43,10 @@ jobs:
             target_dir: mt7622
 
     steps:
-      - name: Checkout Repository
+      - name: 检查库
         uses: actions/checkout@v4
 
-      - name: Setup Build Environment
+      - name: 初始化编译依赖
         run: |
           echo "🚀 正在安装基础依赖..."
           # 安装基础编译环境
@@ -58,17 +58,17 @@ jobs:
           # 安装 zstd 解压工具 (SDK 使用 .zst 格式)
           sudo apt-get install -y ccache zstd
 
-      - name: Download ImmortalWrt SDK
+      - name: 下载SDK
         run: |
           BUILD_TYPE=${{ github.event.inputs.build_type }}
           
-          # 根据矩阵参数构建 URL
-          # 示例: https://downloads.immortalwrt.org/snapshots/targets/x86/64/immortalwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+          # 根据矩阵参数构建 URL  
+          # 示例:https://downloads.openwrt.org/snapshots/targets/x86/64/openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst
           if [ "$BUILD_TYPE" = "snapshots" ]; then
-            BASE_URL="https://downloads.immortalwrt.org/snapshots"
+            BASE_URL="https://downloads.openwrt.org/snapshots"
             # 注意：文件名中的 target 需要将目录结构连接起来 (x86/64 -> x86-64)
             FILE_TARGET_NAME=$(echo "${{ matrix.subdir }}-${{ matrix.target_dir }}" | sed 's/\//-/g')
-            DOWNLOAD_URL="${BASE_URL}/targets/${{ matrix.subdir }}/${{ matrix.target_dir }}/immortalwrt-sdk-${FILE_TARGET_NAME}_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
+            DOWNLOAD_URL="${BASE_URL}/targets/${{ matrix.subdir }}/${{ matrix.target_dir }}/openwrt-sdk-${FILE_TARGET_NAME}_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
           fi
 
           echo "🔽 正在下载 SDK: $DOWNLOAD_URL"
@@ -85,12 +85,7 @@ jobs:
           tar --zstd -xf sdk.tar.zst --strip-components=1
           rm sdk.tar.zst
           
-          # 初始化 feeds
-          echo "⚙️ 初始化 Feeds..."
-          ls
-          ./scripts/feeds update -a
-
-      - name: Inject Local Luci Sources
+      - name: 源码注入
         run: |
           if [ ! -d "luci" ]; then
             echo "::error::找不到 luci 目录！请确保仓库根目录有 luci 文件夹。"
@@ -99,14 +94,18 @@ jobs:
           
           mkdir -p package/custom-luci
           cp -r luci/* package/custom-luci/
-          ls  package/custom-luci/
           
           echo "✅ 源码注入完成"
+          
+            # 初始化 feeds
+          echo "⚙️ 初始化 Feeds..."
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a -f
 
-      - name: Configure and Compile
+      - name: 配置和编译
         run: |
           # 生成默认配置
-          echo "CONFIG_CCACHE=y" >> .config
+          #echo "CONFIG_CCACHE=y" >> .config
           make defconfig
 
           # 扫描插件并编译
@@ -121,22 +120,24 @@ jobs:
             fi
            done
 
-      - name: Organize Output Files
+      - name: 整理输出文件
         run: |
-          mkdir -p APK/${{ matrix.target }}   # 创建目标目录：APK/[架构名]
+          #mkdir -p APK/${{ matrix.target }}   # 创建目标目录：APK/[架构名]
+          mkdir -p APK
           ls /bin
-          cp -r /bin/packages/* APK/${{ matrix.target }}/  # 将 SDK 中 bin/packages 下的所有内容（所有子文件夹和文件）复制到目标目录# 使用 cp -r 递归复制，保留目录结构
-      - name: Commit Results
+          cp -r /bin/* APK/  #${{ matrix.target }}/   #将 SDK 中 bin/packages 下的所有内容（所有子文件夹和文件）复制到目标目录# 使用 cp -r 递归复制，保留目录结构
+          
+      - name: 提交文件
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           file_pattern: APK/
           commit_message: Auto compile ${{ matrix.target }} full package repository
           branch: ${{ github.head_ref || github.ref_name }}
+		  
 #- name: Upload Artifacts
        #uses: actions/upload-artifact@v4
        #with:
          #name: luci-plugins-${{ matrix.target }}
          #path: bin/packages/**/*.ipk
          #retention-days: 7
-
 
