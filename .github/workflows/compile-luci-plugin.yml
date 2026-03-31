@@ -122,9 +122,7 @@ jobs:
 
       - name: 整理输出文件
         run: |
-          mkdir -p APK
-          ls /bin
-          cp -r /bin/* APK/
+          mkdir -p APK && ls /bin && cp -r /bin/* APK/
           
       - name: 提交文件
         uses: stefanzweifel/git-auto-commit-action@v4
