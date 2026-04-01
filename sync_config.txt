@@ -5,7 +5,7 @@
 
 # --- kiddin9/op-packages ---
 REPO:https://github.com/kiddin9/op-packages.git:main
-luci-app-adguardhome:luci
+#luci-app-adguardhome:luci
 luci-app-wrtbwmon:luci
 wrtbwmon:luci
 homebox:luci
@@ -17,8 +17,6 @@ luci-app-timedreboot:luci
 luci-app-wolplus:luci
 luci-app-socat:luci
 luci-app-netspeedtest:luci
-homebox:luci
-ookla-speedtest:luci
 luci-app-dockerman:luci
 luci-lib-docker:luci
 dockerd:luci
