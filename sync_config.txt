@@ -19,6 +19,9 @@ luci-app-socat:luci
 luci-app-netspeedtest:luci
 homebox:luci
 ookla-speedtest:luci
+luci-app-dockerman:luci
+luci-lib-docker:luci
+dockerd:luci
 
 # --------- VIKINGYFY --------
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
