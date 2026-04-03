@@ -217,29 +217,25 @@ const methods = {
 				invalid_node: 'invalid_node',
 				invalid_mode: 'invalid_mode',
 				mode_mismatch: 'mode_mismatch',
-				real_proxy_invalid_outbound: 'real_proxy_invalid_outbound',
-				real_proxy_runtime_prepare_failed: 'real_proxy_runtime_prepare_failed',
-				real_proxy_runtime_launch_failed: 'real_proxy_runtime_launch_failed',
-				real_proxy_runtime_timeout: 'real_proxy_runtime_timeout',
-				real_proxy_delay_timeout: 'real_proxy_delay_timeout',
-				real_proxy_delay_failed: 'real_proxy_delay_failed',
+				rp_invalid_outbound: 'rp_invalid_outbound',
+				rp_runtime_prepare_failed: 'rp_runtime_prepare_failed',
+				rp_runtime_launch_failed: 'rp_runtime_launch_failed',
+				rp_runtime_timeout: 'rp_runtime_timeout',
+				rp_delay_timeout: 'rp_delay_timeout',
+				rp_delay_failed: 'rp_delay_failed',
 				icmp_probe_unavailable: 'icmp_probe_unavailable',
-				tcp_probe_unavailable: 'tcp_probe_unavailable',
 				icmp_timeout: 'icmp_timeout',
-				tcp_timeout: 'tcp_timeout',
 				icmp_failed: 'icmp_failed',
-				tcp_failed: 'tcp_failed',
 				probe_timeout: 'probe_timeout',
 				backend_execution_failed: 'backend_execution_failed',
-				connection_failed: 'connection_failed',
 				probe_failed: 'probe_failed'
 			};
 			const probe_timeout_s = 3;
 			const probe_timeout_ms = probe_timeout_s * 1000;
 			const probe_system_timeout_ms = probe_timeout_ms + 250;
-			const real_proxy_probe_url = 'https://cp.cloudflare.com/generate_204';
-			const real_proxy_probe_url_encoded = 'https%3A%2F%2Fcp.cloudflare.com%2Fgenerate_204';
-			const real_proxy_delay_timeout_ms = 5000;
+			const rp_probe_url = 'https://cp.cloudflare.com/generate_204';
+			const rp_probe_url_encoded = 'https%3A%2F%2Fcp.cloudflare.com%2Fgenerate_204';
+			const rp_delay_timeout_ms = 5000;
 
 			const formatResult = (node, state, latency_ms, err, extras) => ({
 				node,
@@ -248,10 +244,8 @@ const methods = {
 				measured_at: time(),
 				error: err,
 				icmp_latency_ms: (extras && extras.icmp_latency_ms != null) ? extras.icmp_latency_ms : null,
-				tcp_latency_ms: (extras && extras.tcp_latency_ms != null) ? extras.tcp_latency_ms : null,
 				icmp_error: (extras && extras.icmp_error) ? extras.icmp_error : null,
-				tcp_error: (extras && extras.tcp_error) ? extras.tcp_error : null,
-				real_proxy_runtime: (extras && extras.real_proxy_runtime) ? extras.real_proxy_runtime : null
+				rp_runtime: (extras && extras.rp_runtime) ? extras.rp_runtime : null
 			});
 
 			const strToBool = (str) => ((str === '1') || null);
@@ -658,7 +652,7 @@ const methods = {
 				if (!rendered_outbound || type(rendered_outbound) !== 'object' || rendered_outbound.tag !== selected_tag || !rendered_outbound.type)
 					return {
 						error: 'failed to render temporary outbound for selected node',
-						code: error_codes.real_proxy_invalid_outbound
+						code: error_codes.rp_invalid_outbound
 					};
 
 				if (node_cfg.type === 'wireguard')
@@ -730,21 +724,21 @@ const methods = {
 					'%s/proxies/%s/delay?url=%s&timeout=%d',
 					runtime_meta.controller_url,
 					selected_tag,
-					real_proxy_probe_url_encoded,
-					real_proxy_delay_timeout_ms
+					rp_probe_url_encoded,
+					rp_delay_timeout_ms
 				);
 
 				const started_ms = monotonicMs();
 				const fd = popen(sprintf(
 					'/usr/bin/wget -qO- -T %d %s 2>"/dev/null"',
-					int((real_proxy_delay_timeout_ms + 999) / 1000),
+					int((rp_delay_timeout_ms + 999) / 1000),
 					shellquote(delay_endpoint)
 				));
 				if (!fd)
 					return {
 						state: 'timeout',
 						error: {
-							code: error_codes.real_proxy_delay_timeout,
+							code: error_codes.rp_delay_timeout,
 							message: 'failed to open temporary Clash API delay endpoint'
 						}
 					};
@@ -760,19 +754,19 @@ const methods = {
 
 				const ended_ms = monotonicMs();
 				if (!trim(payload || '')) {
-					if (started_ms !== null && ended_ms !== null && ended_ms - started_ms >= real_proxy_delay_timeout_ms)
+					if (started_ms !== null && ended_ms !== null && ended_ms - started_ms >= rp_delay_timeout_ms)
 						return {
 							state: 'timeout',
 							error: {
-								code: error_codes.real_proxy_delay_timeout,
-								message: sprintf('temporary Clash API delay request timed out after %dms', real_proxy_delay_timeout_ms)
+								code: error_codes.rp_delay_timeout,
+								message: sprintf('temporary Clash API delay request timed out after %dms', rp_delay_timeout_ms)
 							}
 						};
 
 					return {
 						state: 'error',
 						error: {
-							code: error_codes.real_proxy_delay_failed,
+							code: error_codes.rp_delay_failed,
 							message: 'temporary Clash API delay response is empty'
 						}
 					};
@@ -785,7 +779,7 @@ const methods = {
 					return {
 						state: 'error',
 						error: {
-							code: error_codes.real_proxy_delay_failed,
+							code: error_codes.rp_delay_failed,
 							message: 'temporary Clash API delay response is not valid JSON'
 						}
 					};
@@ -799,11 +793,11 @@ const methods = {
 					};
 
 				const failure_msg = trim(sprintf('%s', data?.message || data?.error || '')) || 'temporary Clash API delay request failed';
-				if (match(failure_msg, /timeout/i) || (started_ms !== null && ended_ms !== null && ended_ms - started_ms >= real_proxy_delay_timeout_ms))
+				if (match(failure_msg, /timeout/i) || (started_ms !== null && ended_ms !== null && ended_ms - started_ms >= rp_delay_timeout_ms))
 					return {
 						state: 'timeout',
 						error: {
-							code: error_codes.real_proxy_delay_timeout,
+							code: error_codes.rp_delay_timeout,
 							message: failure_msg
 						}
 					};
@@ -811,15 +805,18 @@ const methods = {
 				return {
 					state: 'error',
 					error: {
-						code: error_codes.real_proxy_delay_failed,
+						code: error_codes.rp_delay_failed,
 						message: failure_msg
 					}
 				};
 			};
 
+			const normalizeLatencyMode = (m) => (m === 'tcp') ? 'icmp' : m;
 			const node = trim(req.args?.node || '') || null;
-			const mode = trim(req.args?.mode || '');
-			const allowed_modes = ['icmp', 'tcp', 'real_proxy'];
+			const requested_mode = trim(req.args?.mode || '');
+			const mode = normalizeLatencyMode(requested_mode);
+			const allowed_modes = ['icmp', 'rp'];
+			const allowed_configured_modes = ['icmp', 'tcp', 'rp'];
 			if (!node)
 				return formatResult(null, 'error', null, {
 					code: error_codes.invalid_node,
@@ -835,11 +832,12 @@ const methods = {
 			const uci = cursor();
 			uci.load('homeproxy');
 
-			const configured_mode = trim(uci.get('homeproxy', 'subscription', 'latency_test_mode') || '');
-			if (configured_mode && index(allowed_modes, configured_mode) === -1)
+			const configured_mode_raw = trim(uci.get('homeproxy', 'subscription', 'latency_test_mode') || '');
+			const configured_mode = normalizeLatencyMode(configured_mode_raw);
+			if (configured_mode_raw && index(allowed_configured_modes, configured_mode_raw) === -1)
 				return formatResult(node, 'error', null, {
 					code: error_codes.invalid_mode,
-					message: sprintf('configured latency test mode is invalid: %s', configured_mode || '(empty)')
+					message: sprintf('configured latency test mode is invalid: %s', configured_mode_raw || '(empty)')
 				});
 
 			if (configured_mode && configured_mode !== mode)
@@ -857,14 +855,13 @@ const methods = {
 
 			const address = trim(section.address || '');
 			const port = int(section.port || '0');
-			const port_str = sprintf('%d', port);
 			if (!address || port <= 0 || port > 65535)
 				return formatResult(node, 'error', null, {
 					code: error_codes.invalid_node,
 					message: 'node address or port is invalid'
 				});
 
-			if (mode === 'real_proxy') {
+			if (mode === 'rp') {
 				let runtime_meta = null;
 				let runtime_active = false;
 				let runtime_info = {
@@ -884,10 +881,10 @@ const methods = {
 
 				if (runtime_meta?.error)
 					return formatResult(node, 'error', null, {
-						code: runtime_meta.code || error_codes.real_proxy_runtime_prepare_failed,
+						code: runtime_meta.code || error_codes.rp_runtime_prepare_failed,
 						message: runtime_meta.error
 					}, {
-						real_proxy_runtime: runtime_info
+						rp_runtime: runtime_info
 					});
 
 				runtime_info.session_dir = runtime_meta.session_dir;
@@ -904,22 +901,22 @@ const methods = {
 					}
 
 					return formatResult(node, state, latency_ms, err, {
-						real_proxy_runtime: runtime_info
+						rp_runtime: runtime_info
 					});
 				};
 
 				try {
 					if (!launchProbeRuntime(runtime_meta))
 						return finalizeRealProxyResult('error', null, {
-							code: error_codes.real_proxy_runtime_launch_failed,
+							code: error_codes.rp_runtime_launch_failed,
 							message: 'failed to launch temporary sing-box runtime'
 						});
 
 					runtime_info.launched = true;
 
-					if (!waitControllerReady(runtime_meta, real_proxy_delay_timeout_ms))
+					if (!waitControllerReady(runtime_meta, rp_delay_timeout_ms))
 						return finalizeRealProxyResult('timeout', null, {
-							code: error_codes.real_proxy_runtime_timeout,
+							code: error_codes.rp_runtime_timeout,
 							message: 'temporary sing-box runtime controller did not become ready in time'
 						});
 
@@ -930,24 +927,23 @@ const methods = {
 
 					if (delay_result.state === 'timeout')
 						return finalizeRealProxyResult('timeout', null, delay_result.error || {
-							code: error_codes.real_proxy_delay_timeout,
-							message: sprintf('temporary Clash API delay request timed out after %dms', real_proxy_delay_timeout_ms)
+							code: error_codes.rp_delay_timeout,
+							message: sprintf('temporary Clash API delay request timed out after %dms', rp_delay_timeout_ms)
 						});
 
 					return finalizeRealProxyResult('error', null, delay_result.error || {
-						code: error_codes.real_proxy_delay_failed,
-						message: sprintf('temporary Clash API delay probe failed for %s', real_proxy_probe_url)
+						code: error_codes.rp_delay_failed,
+						message: sprintf('temporary Clash API delay probe failed for %s', rp_probe_url)
 					});
 				} catch (e) {
 					return finalizeRealProxyResult('error', null, {
 						code: error_codes.backend_execution_failed,
-						message: 'unexpected backend error while handling temporary real_proxy runtime'
+						message: 'unexpected backend error while handling temporary rp runtime'
 					});
 				}
 			}
 
 			const ping = access('/bin/ping') ? '/bin/ping' : (access('/usr/bin/ping') ? '/usr/bin/ping' : null);
-			const netcat = access('/usr/bin/nc') ? '/usr/bin/nc' : (access('/bin/nc') ? '/bin/nc' : null);
 
 			const runProbe = (command, timeout_ms) => {
 				const started_ms = monotonicMs();
@@ -960,135 +956,60 @@ const methods = {
 			};
 
 			let icmp_latency_ms = null;
-			let tcp_latency_ms = null;
 			let icmp_error = null;
-			let tcp_error = null;
 
-			if (mode === 'icmp') {
-				if (!ping) {
-					icmp_error = {
-						code: error_codes.icmp_probe_unavailable,
-						message: 'missing ping executable for ICMP probe'
-					};
-				}
-				else {
-					const result = runProbe(
-						`${ping} -c 1 -W ${probe_timeout_s} ${shellquote(address)} >/dev/null 2>/dev/null`,
-						probe_system_timeout_ms
-					);
-
-					if (result.probe_exit === 0)
-						icmp_latency_ms = (result.latency_ms !== null) ? result.latency_ms : 0;
-					else if (result.probe_exit === -1 || (result.latency_ms !== null && result.latency_ms >= probe_timeout_ms))
-						icmp_error = {
-							code: error_codes.icmp_timeout,
-							message: `ICMP ping timeout after ${probe_timeout_s}s`
-						};
-					else if (result.probe_exit === 127)
-						icmp_error = {
-							code: error_codes.backend_execution_failed,
-							message: 'ICMP ping command execution failed'
-						};
-					else
-						icmp_error = {
-							code: error_codes.icmp_failed,
-							message: `ICMP ping failed with exit code ${result.probe_exit}`
-						};
-				}
-
-				if (icmp_latency_ms !== null)
-					return formatResult(node, 'success', icmp_latency_ms, null, {
-						icmp_latency_ms,
-						tcp_latency_ms,
-						icmp_error,
-						tcp_error
-					});
-
-				if (icmp_error?.code === error_codes.icmp_timeout)
-					return formatResult(node, 'timeout', null, {
-						code: error_codes.probe_timeout,
-						message: `ICMP probe timed out after ${probe_timeout_s}s`
-					}, {
-						icmp_latency_ms,
-						tcp_latency_ms,
-						icmp_error,
-						tcp_error
-					});
-
-				return formatResult(node, 'error', null, icmp_error || {
-					code: error_codes.probe_failed,
-					message: 'ICMP probe failed'
-				}, {
-					icmp_latency_ms,
-					tcp_latency_ms,
-					icmp_error,
-					tcp_error
-				});
-			}
-
-			if (!netcat) {
-				tcp_error = {
-					code: error_codes.tcp_probe_unavailable,
-					message: 'missing netcat executable for TCP probe'
+			if (!ping) {
+				icmp_error = {
+					code: error_codes.icmp_probe_unavailable,
+					message: 'missing ping executable for ICMP probe'
 				};
 			}
 			else {
 				const result = runProbe(
-					`${netcat} -w ${probe_timeout_s} ${shellquote(address)} ${shellquote(port_str)} </dev/null >/dev/null 2>/dev/null`,
+					`${ping} -c 1 -W ${probe_timeout_s} ${shellquote(address)} >/dev/null 2>/dev/null`,
 					probe_system_timeout_ms
 				);
 
 				if (result.probe_exit === 0)
-					tcp_latency_ms = (result.latency_ms !== null) ? result.latency_ms : 0;
+					icmp_latency_ms = (result.latency_ms !== null) ? result.latency_ms : 0;
 				else if (result.probe_exit === -1 || (result.latency_ms !== null && result.latency_ms >= probe_timeout_ms))
-					tcp_error = {
-						code: error_codes.tcp_timeout,
-						message: `TCP ping timeout after ${probe_timeout_s}s`
+					icmp_error = {
+						code: error_codes.icmp_timeout,
+						message: `ICMP ping timeout after ${probe_timeout_s}s`
 					};
 				else if (result.probe_exit === 127)
-					tcp_error = {
+					icmp_error = {
 						code: error_codes.backend_execution_failed,
-						message: 'TCP ping command execution failed'
-					};
-				else if (result.probe_exit === 1)
-					tcp_error = {
-						code: error_codes.connection_failed,
-						message: `TCP connection probe failed with exit code ${result.probe_exit}`
+						message: 'ICMP ping command execution failed'
 					};
 				else
-					tcp_error = {
-						code: error_codes.tcp_failed,
-						message: `TCP ping failed with exit code ${result.probe_exit}`
+					icmp_error = {
+						code: error_codes.icmp_failed,
+						message: `ICMP ping failed with exit code ${result.probe_exit}`
 					};
 			}
 
-			if (tcp_latency_ms !== null)
-				return formatResult(node, 'success', tcp_latency_ms, null, {
+			if (icmp_latency_ms !== null)
+				return formatResult(node, 'success', icmp_latency_ms, null, {
 					icmp_latency_ms,
-					tcp_latency_ms,
-					icmp_error,
-					tcp_error
+					icmp_error
 				});
 
-			if (tcp_error?.code === error_codes.tcp_timeout)
+			if (icmp_error?.code === error_codes.icmp_timeout)
 				return formatResult(node, 'timeout', null, {
 					code: error_codes.probe_timeout,
-					message: `TCP probe timed out after ${probe_timeout_s}s`
+					message: `ICMP probe timed out after ${probe_timeout_s}s`
 				}, {
 					icmp_latency_ms,
-					tcp_latency_ms,
-					icmp_error,
-					tcp_error
+					icmp_error
 				});
 
-			return formatResult(node, 'error', null, tcp_error || {
+			return formatResult(node, 'error', null, icmp_error || {
 				code: error_codes.probe_failed,
-				message: 'TCP probe failed'
+				message: 'ICMP probe failed'
 			}, {
 				icmp_latency_ms,
-				tcp_latency_ms,
-				icmp_error,
-				tcp_error
+				icmp_error
 			});
 		}
 	},

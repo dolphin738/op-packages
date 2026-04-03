@@ -427,10 +427,15 @@ const NODE_LATENCY_ROW_STATES = Object.freeze({
 });
 
 const NODE_LATENCY_ROW_STATE_VALUES = Object.freeze(Object.values(NODE_LATENCY_ROW_STATES));
-const NODE_LATENCY_TEST_MODES = Object.freeze([ 'icmp', 'tcp', 'real_proxy' ]);
+const NODE_LATENCY_TEST_MODES = Object.freeze([ 'icmp', 'rp' ]);
+
+function remapLegacyNodeLatencyTestMode(mode) {
+	return mode === 'tcp' ? 'icmp' : mode;
+}
 
 function normalizeNodeLatencyTestMode(mode) {
-	return NODE_LATENCY_TEST_MODES.includes(mode) ? mode : 'tcp';
+	mode = remapLegacyNodeLatencyTestMode(mode);
+	return NODE_LATENCY_TEST_MODES.includes(mode) ? mode : 'icmp';
 }
 
 function resolveNodeLatencyResultByMode(result, mode) {
@@ -444,11 +449,6 @@ function resolveNodeLatencyResultByMode(result, mode) {
 			active_latency_ms = result.icmp_latency_ms;
 		if (result && result.icmp_error)
 			active_error = result.icmp_error;
-	} else if (active_mode === 'tcp') {
-		if (result && result.tcp_latency_ms != null)
-			active_latency_ms = result.tcp_latency_ms;
-		if (result && result.tcp_error)
-			active_error = result.tcp_error;
 	}
 
 	if (active_error?.code?.endsWith('_timeout'))
@@ -468,51 +468,43 @@ function resolveNodeLatencyResultByMode(result, mode) {
 
 function getNodeLatencyErrorText(error_code) {
 	switch (error_code) {
-	case 'invalid_node':
-		return '无效节点';
-	case 'icmp_probe_unavailable':
-		return '后端执行失败';
-	case 'tcp_probe_unavailable':
-		return '后端执行失败';
-	case 'icmp_timeout':
-		return '超时';
-	case 'tcp_timeout':
-		return '超时';
+	case 'backend_execution failed':
+		return _('Backend execution failed');
 	case 'icmp_failed':
-		return '探测失败';
-	case 'tcp_failed':
-		return '探测失败';
-	case 'connection_failed':
-		return '连接失败';
-	case 'backend_execution_failed':
-		return '后端执行失败';
+		return _('ICMP Failed');
+	case 'icmp_probe_unavailable':
+		return _('ICMP Probe unavailable');
+	case 'icmp_timeout':
+		return _('ICMP Timeout');
+	case 'invalid_node':
+		return _('Invalid node');
 	case 'invalid_response':
-		return '无效响应';
-	case 'rpc_failed':
-		return 'RPC 请求失败';
+		return _('Invalid response');
 	case 'probe_failed':
-		return '探测失败';
+		return _('Probe failed');
+	case 'rpc_failed':
+		return _('RPC failed');
 	default:
-		return '错误';
+		return _('Error');
 	}
 }
 
 function getNodeLatencyStatusText(row_state) {
 	if (!row_state)
-		return '未测试';
+		return _('Not Tested');
 
 	switch (row_state.state) {
 	case NODE_LATENCY_ROW_STATES.TESTING:
-		return '测试中...';
+		return _('Testing');
 	case NODE_LATENCY_ROW_STATES.SUCCESS:
 		return (row_state.latency_ms != null) ? _('%s ms').format(row_state.latency_ms) : _('Success');
 	case NODE_LATENCY_ROW_STATES.TIMEOUT:
-		return '超时';
+		return _('Timeout');
 	case NODE_LATENCY_ROW_STATES.ERROR:
 		return getNodeLatencyErrorText(row_state.error?.code);
 	case NODE_LATENCY_ROW_STATES.UNTESTED:
 	default:
-		return '未测试';
+		return _('Not Tested');
 	}
 }
 
@@ -539,13 +531,104 @@ function renderNodeLatencyStatus(row_state) {
 	return '<strong style="%s">%s</strong>'.format(getNodeLatencyStatusStyle(row_state), getNodeLatencyStatusText(row_state));
 }
 
+function renderNodeLatencyStatusNode(row_state, attrs) {
+	return E('strong', Object.assign({
+		'style': getNodeLatencyStatusStyle(row_state)
+	}, attrs || {}), [ getNodeLatencyStatusText(row_state) ]);
+}
+
 function getNodeLatencyActionTitle(row_state) {
-	return (row_state?.state === NODE_LATENCY_ROW_STATES.TESTING) ? '测试中...' : '测试';
+	return (row_state?.state === NODE_LATENCY_ROW_STATES.TESTING) ? _('Testing') : _('Test');
 }
 
 function parseNodeLatencySectionId(widget_id) {
 	let matched = String(widget_id || '').match(/^cbi-homeproxy-(.*)-_test_latency$/);
 	return matched ? matched[1] : null;
+}
+
+function parseActiveSubscriptionTabId(value) {
+	let matched = String(value || '').match(/(?:^|[^\w])(sub_[0-9a-f]+)(?:$|[^\w])/i);
+	return matched ? matched[1] : null;
+}
+
+function parseActiveNodeListTabId(value) {
+	let matched = String(value || '').match(/(?:^|[^\w])(node|subscription|sub_[0-9a-f]+)(?:$|[^\w])/i);
+	return matched ? matched[1].toLowerCase() : null;
+}
+
+function getActiveNodeListTabId(root_el) {
+	let active_tab = null;
+	let active_tab_nodes = root_el.querySelectorAll('.cbi-tabmenu li.cbi-tab-active, .cbi-tabmenu li.active, .cbi-tabmenu [aria-selected="true"]');
+
+	for (let node of active_tab_nodes) {
+		let tab_id = parseActiveNodeListTabId(node?.getAttribute('data-tab'))
+			|| parseActiveNodeListTabId(node?.dataset?.tab)
+			|| parseActiveNodeListTabId(node?.getAttribute('id'));
+		if (!tab_id && node?.querySelector)
+			tab_id = parseActiveNodeListTabId(node.querySelector('a')?.getAttribute('href'))
+				|| parseActiveNodeListTabId(node.querySelector('a')?.getAttribute('data-tab'));
+
+		if (tab_id) {
+			active_tab = tab_id;
+			break;
+		}
+	}
+
+	if (!active_tab) {
+		let fallback_tab_nodes = root_el.querySelectorAll('.cbi-tabmenu li.cbi-tab[data-tab], .cbi-tabmenu li[data-tab]:not(.cbi-tab-disabled)');
+
+		for (let node of fallback_tab_nodes) {
+			let tab_id = parseActiveNodeListTabId(node?.getAttribute('data-tab')) || parseActiveNodeListTabId(node?.dataset?.tab);
+			if (tab_id) {
+				active_tab = tab_id;
+				break;
+			}
+		}
+	}
+
+	return active_tab;
+}
+
+function shouldShowBulkLatencyButton(root_el) {
+	let active_tab = getActiveNodeListTabId(root_el);
+
+	if (!active_tab)
+		return false;
+
+	return !!parseActiveSubscriptionTabId(active_tab);
+}
+
+function getActiveSubscriptionTabId(root_el) {
+	let active_tab = getActiveNodeListTabId(root_el);
+	return parseActiveSubscriptionTabId(active_tab);
+}
+
+function getActiveSubscriptionTabContainer(root_el, active_tab) {
+	if (!active_tab)
+		return null;
+
+	let candidates = [];
+	for (let selector of [
+		'.cbi-tabcontainer[data-tab="%s"]'.format(active_tab),
+		'[data-tab="%s"]'.format(active_tab),
+		'[id="tab.%s"]'.format(active_tab),
+		'[id="tab-%s"]'.format(active_tab),
+		'[id="%s"]'.format(active_tab)
+	]) {
+		candidates = candidates.concat(Array.from(root_el.querySelectorAll(selector)));
+	}
+
+	return candidates.find((node) => !node.closest('.cbi-tabmenu') && node.querySelector('div[id$="-_test_latency"]')) || null;
+}
+
+function getActiveSubscriptionLatencySectionIds(root_el) {
+	let active_tab = getActiveSubscriptionTabId(root_el);
+	let active_container = getActiveSubscriptionTabContainer(root_el, active_tab);
+	if (!active_container)
+		return [];
+
+	let widgets = Array.from(active_container.querySelectorAll('div[id$="-_test_latency"]'));
+	return widgets.map((node) => parseNodeLatencySectionId(node.id)).filter((sid) => !!sid);
 }
 
 function createNodeLatencyRowStateModel() {
@@ -559,11 +642,9 @@ function createNodeLatencyRowStateModel() {
 		mode: resolved_result.mode,
 		latency_ms: resolved_result.latency_ms,
 		icmp_latency_ms: (result && result.icmp_latency_ms != null) ? result.icmp_latency_ms : null,
-		tcp_latency_ms: (result && result.tcp_latency_ms != null) ? result.tcp_latency_ms : null,
 		measured_at: (result && result.measured_at) ? result.measured_at : null,
 		error: resolved_result.error,
-		icmp_error: (result && result.icmp_error) ? result.icmp_error : null,
-		tcp_error: (result && result.tcp_error) ? result.tcp_error : null
+		icmp_error: (result && result.icmp_error) ? result.icmp_error : null
 		};
 	};
 
@@ -576,10 +657,10 @@ function createNodeLatencyRowStateModel() {
 
 	const ensure = (section_id) => {
 		if (!section_id)
-			return buildRowState(NODE_LATENCY_ROW_STATES.UNTESTED, null, 'tcp');
+			return buildRowState(NODE_LATENCY_ROW_STATES.UNTESTED, null, 'icmp');
 
 		if (!rows[section_id])
-			rows[section_id] = buildRowState(NODE_LATENCY_ROW_STATES.UNTESTED, null, 'tcp');
+			rows[section_id] = buildRowState(NODE_LATENCY_ROW_STATES.UNTESTED, null, 'icmp');
 
 		return rows[section_id];
 	};
@@ -634,6 +715,7 @@ function renderNodeSettings(section, data, features, main_node, routing_mode, no
 	s.rowcolors = true;
 	s.sortable = true;
 	s.nodescriptions = true;
+	s.max_cols = 7;
 	s.modaltitle = L.bind(hp.loadModalTitle, this, _('Node'), _('Add a node'), data[0]);
 	s.sectiontitle = L.bind(hp.loadDefaultLabel, this, data[0]);
 	s.node_latency_row_state = node_latency_row_state;
@@ -648,9 +730,10 @@ function renderNodeSettings(section, data, features, main_node, routing_mode, no
 	}
 	s.syncNodeLatencyTestMode = function(mode) {
 		let normalized_mode = normalizeNodeLatencyTestMode(mode);
-		let saved_mode = normalizeNodeLatencyTestMode(uci.get(data[0], 'subscription', 'latency_test_mode'));
+		let saved_mode_value = uci.get(data[0], 'subscription', 'latency_test_mode');
+		let saved_mode = normalizeNodeLatencyTestMode(saved_mode_value);
 
-		if (saved_mode === normalized_mode)
+		if (saved_mode === normalized_mode && saved_mode_value !== 'tcp')
 			return Promise.resolve(normalized_mode);
 
 		uci.set(data[0], 'subscription', 'latency_test_mode', normalized_mode);
@@ -733,15 +816,20 @@ function renderNodeSettings(section, data, features, main_node, routing_mode, no
 
 	o = s.option(form.DummyValue, '_latency', _('Latency'));
 	o.rawhtml = true;
-	o.editable = true;
 	o.modalonly = false;
-	o.cfgvalue = function(section_id) {
-		return renderNodeLatencyStatus(this.section.getNodeLatencyRowState(section_id));
+	o.textvalue = function(section_id) {
+		return E('span', { 'id': 'cbi-%s-%s-_latency'.format(data[0], section_id) }, [
+			renderNodeLatencyStatusNode(this.section.getNodeLatencyRowState(section_id))
+		]);
 	}
 
-	o = s.option(form.DummyValue, '_test_latency', _('Test'));
+	o = s.option(form.Button, '_test_latency', _('Test'));
 	o.editable = true;
 	o.modalonly = false;
+	o.inputstyle = 'action';
+	o.inputtitle = function(section_id) {
+		return getNodeLatencyActionTitle(this.section.getNodeLatencyRowState(section_id));
+	}
 	o.renderWidget = function(section_id, _option_index, cfgvalue) {
 		let hiddenEl = new ui.Hiddenfield((cfgvalue != null) ? cfgvalue : '', {
 			id: this.cbid(section_id)
@@ -1694,9 +1782,8 @@ return view.extend({
 		o = s.taboption('subscription', form.ListValue, 'latency_test_mode', _('Latency test mode'),
 			_('Choose which method node latency tests use.'));
 		o.value('icmp', _('ICMP'));
-		o.value('tcp', _('TCP'));
-		o.value('real_proxy', _('Real Proxy'));
-		o.default = 'tcp';
+		o.value('rp', _('RP'));
+		o.default = 'icmp';
 		o.rmempty = false;
 
 		o = s.taboption('subscription', form.DynamicList, 'subscription_url', _('Subscription URL-s'),
@@ -1815,30 +1902,34 @@ return view.extend({
 
 		return m.render().then((el) => {
 			let bulk_testing = false;
+			let tabmenu_observer = null;
 			let bulk_button = E('button', {
 				'class': 'cbi-button cbi-button-action hp-bulk-latency-test',
 				'click': ui.createHandlerFn(this, async () => {
 					if (bulk_testing || typeof globalThis === 'undefined' || !globalThis.__hpNodeLatencyTrigger)
 						return false;
 
-					let widgets = Array.from(el.querySelectorAll('div[id$="-_test_latency"]')).filter((node) => node.offsetParent !== null);
-					let section_ids = widgets.map((node) => parseNodeLatencySectionId(node.id)).filter((sid) => !!sid);
+					let section_ids = getActiveSubscriptionLatencySectionIds(el);
 					if (!section_ids.length)
 						return false;
 
 					bulk_testing = true;
-					bulk_button.textContent = '正在测试当前列表...';
+					bulk_button.textContent = _('Testing Current List...');
 					bulk_button.disabled = true;
 
 					for (let sid of section_ids)
 						await globalThis.__hpNodeLatencyTrigger(sid);
 
 					bulk_testing = false;
-					bulk_button.textContent = '一键测试当前列表';
+					bulk_button.textContent = _('Test Current List');
 					bulk_button.disabled = false;
 					return true;
 				})
-			}, [ '一键测试当前列表' ]);
+			}, [ _('Test Current List') ]);
+
+			let updateBulkButtonVisibility = () => {
+				bulk_button.style.display = shouldShowBulkLatencyButton(el) ? '' : 'none';
+			};
 
 			let attachBulkButton = () => {
 				let actions = (el.parentElement ? el.parentElement.querySelector('.cbi-page-actions') : null) || document.querySelector('.cbi-page-actions');
@@ -1847,6 +1938,20 @@ return view.extend({
 
 				if (!actions.querySelector('.hp-bulk-latency-test'))
 					actions.insertBefore(bulk_button, actions.firstChild);
+
+				updateBulkButtonVisibility();
+
+				if (!tabmenu_observer) {
+					let tabmenu = el.querySelector('.cbi-tabmenu');
+					if (tabmenu) {
+						tabmenu_observer = new MutationObserver(() => updateBulkButtonVisibility());
+						tabmenu_observer.observe(tabmenu, {
+							subtree: true,
+							attributes: true,
+							attributeFilter: [ 'class', 'aria-selected' ]
+						});
+					}
+				}
 
 				return true;
 			};
