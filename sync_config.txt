@@ -21,6 +21,11 @@ luci-app-dockerman:luci
 luci-lib-docker:luci
 dockerd:luci
 
+# --------- kenzok8 --------
+REPO:https://github.com/kenzok8/jell.git:main
+luci-app-adguardhome:luci
+adguardhome:luci
+
 # --------- VIKINGYFY --------
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
 ./:luci/luci-app-homeproxy/
@@ -97,9 +102,3 @@ openwrt-support/rtp2httpd:luci
 REPO:https://github.com/sbwml/luci-app-mosdns.git:v5
 luci-app-mosdns:luci
 mosdns:luci
-
-# --------- kenzok8 --------
-REPO:https://github.com/kenzok8/jell.git:main
-luci-app-adguardhome:luci
-adguardhome:luci
-
