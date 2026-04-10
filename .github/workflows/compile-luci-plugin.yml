@@ -65,11 +65,13 @@ jobs:
           
           # 根据矩阵参数构建 URL  
           # 示例:https://downloads.openwrt.org/snapshots/targets/x86/64/openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+          # 示例:https://downloads.immortalwrt.org/snapshots/targets/x86/64/immortalwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst
           if [ "$BUILD_TYPE" = "snapshots" ]; then
-            BASE_URL="https://downloads.openwrt.org/snapshots"
+            #BASE_URL="https://downloads.openwrt.org/snapshots"
+            BASE_URL="https://downloads.immortalwrt.org/snapshots"
             # 注意：文件名中的 target 需要将目录结构连接起来 (x86/64 -> x86-64)
             FILE_TARGET_NAME=$(echo "${{ matrix.subdir }}-${{ matrix.target_dir }}" | sed 's/\//-/g')
-            DOWNLOAD_URL="${BASE_URL}/targets/${{ matrix.subdir }}/${{ matrix.target_dir }}/openwrt-sdk-${FILE_TARGET_NAME}_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
+            DOWNLOAD_URL="${BASE_URL}/targets/${{ matrix.subdir }}/${{ matrix.target_dir }}/immortalwrt-sdk-${FILE_TARGET_NAME}_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
           fi
 
           echo "🔽 正在下载 SDK: $DOWNLOAD_URL"
