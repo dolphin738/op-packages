@@ -11,6 +11,7 @@ on:
         type: choice
         options:
           - snapshots
+          - openwrt-25.12
           # - releases  <-- 未来若需支持 releases 构建，取消此行注释即可
 
   # 2. 自动触发配置
