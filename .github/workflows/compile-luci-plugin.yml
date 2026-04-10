@@ -19,6 +19,10 @@ on:
     #paths:
       #- 'luci/**'          # 监听 luci 目录下的所有改动
       #- '.github/**'       # 监听工作流文件本身的改动
+env:
+  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  WRT_BRANCH: ${{inputs.build_type}}
+
 
 jobs:
   build:
@@ -59,44 +63,17 @@ jobs:
           # 安装 zstd 解压工具 (SDK 使用 .zst 格式)
           sudo apt-get install -y ccache zstd
 
-      - name: 下载SDK
+      - name: 克隆代码
         run: |
-          BUILD_TYPE=${{ github.event.inputs.build_type }}
-          
-          # 根据矩阵参数构建 URL  
-          # 示例:https://downloads.openwrt.org/snapshots/targets/x86/64/openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst
-          if [ "$BUILD_TYPE" = "snapshots" ]; then
-            BASE_URL="https://downloads.openwrt.org/snapshots"
-            # 注意：文件名中的 target 需要将目录结构连接起来 (x86/64 -> x86-64)
-            FILE_TARGET_NAME=$(echo "${{ matrix.subdir }}-${{ matrix.target_dir }}" | sed 's/\//-/g')
-            # 【修复点】使用通配符 * 匹配 GCC 版本，防止 404
-            DOWNLOAD_URL="${BASE_URL}/targets/${{ matrix.subdir }}/${{ matrix.target_dir }}/openwrt-sdk-${FILE_TARGET_NAME}_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
-          fi
+          git clone --depth=1 --single-branch --branch $WRT_BRANCH https://github.com/immortalwrt/immortalwrt.git ./wrt/
 
-          echo "🔽 正在下载 SDK: $DOWNLOAD_URL"
-          # 【修复点】wget 支持 URL 中的通配符（如果是 FTP）或使用 --content-disposition，这里直接下载
-          # 如果通配符无效，wget 会报错，但在 HTTP 下通常需要先获取目录列表。
-          # 更稳妥的方式是直接下载（如果服务器支持 HTTP globbing，否则需用其他方法）
-          # 这里我们先尝试直接下载（部分镜像支持），如果不支持，请替换为具体的已知版本或使用 html parser。
-          # 为了兼容性，如果报错，建议去网页复制最新的具体文件名。
-          
-          # 尝试下载
-          wget -q $DOWNLOAD_URL -O sdk.tar.zst || (
-            echo "::error::SDK 下载失败。请检查网络，或者该 URL 不支持通配符。"
-            echo "尝试访问: $DOWNLOAD_URL"
-            exit 1
-          )
-          
-          if [ ! -f sdk.tar.zst ]; then
-            echo "::error::SDK 下载失败，请检查网络或 URL 是否有效。"
-            exit 1
+          cd ./wrt/ && echo "WRT_HASH=$(git log -1 --pretty=format:'%h')" >> $GITHUB_ENV
+
+          # GitHub Action 移除国内下载源
+          PROJECT_MIRRORS_FILE="./scripts/projectsmirrors.json"
+          if [ -f "$PROJECT_MIRRORS_FILE" ]; then
+            sed -i '/.cn\//d; /tencent/d; /aliyun/d' "$PROJECT_MIRRORS_FILE"
           fi
-          
-          # 解压 .zst 文件
-          echo "📦 解压 SDK..."
-          # -T --xz 有时是必要的，但 tar 通常能自动识别
-          tar --zstd -xf sdk.tar.zst --strip-components=1
-          rm sdk.tar.zst
           
       - name: 源码注入
         run: |
