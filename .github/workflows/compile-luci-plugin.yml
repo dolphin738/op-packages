@@ -43,9 +43,9 @@ jobs:
             target_dir: ipq60xx
             
           # Mediatek MT7622
-          - target: mediatek_mt7622
-            subdir: mediatek
-            target_dir: mt7622
+          #- target: mediatek_mt7622
+            #subdir: mediatek
+            #target_dir: mt7622
 
     steps:
       - name: 检查库
@@ -76,7 +76,7 @@ jobs:
           sudo -E apt -yqq autoclean
           sudo -E apt -yqq clean
           sudo -E apt -yqq install dos2unix python3-netifaces libfuse-dev
-          sudo bash -c 'bash <(curl -sL https://build-scripts.immortalwrt.org/init_build_environment.sh)'
+          sudo bash -c 'bash <(curl -sL https://build-scripts.immortalwrt.org/init_build_environment.sh)' 
           sudo -E systemctl daemon-reload
           sudo -E timedatectl set-timezone "Asia/Shanghai"
 
@@ -99,8 +99,8 @@ jobs:
             exit 1
           fi
           
-          mkdir -p package/custom-luci
-          cp -r luci/* package/custom-luci/
+          mkdir -p ./wrt/package/custom-luci
+          cp -r luci/* ./wrt/package/custom-luci
           
           echo "✅ 源码注入完成"
           
