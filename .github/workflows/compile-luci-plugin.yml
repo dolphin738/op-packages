@@ -113,6 +113,10 @@ jobs:
           
             # 初始化 feeds
           echo "⚙️ 初始化 Feeds..."
+          # 使用 sed 进行替换
+          # 逻辑：匹配非空行且不以#开头的行，在行首添加 #
+          sed -i '/^[^#]/s/^/#/' feeds.conf.default
+          
           ./scripts/feeds update -a
           ./scripts/feeds install -a -f
 
