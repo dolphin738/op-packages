@@ -65,7 +65,7 @@ function renderStatus(isRunning, version, currentNode) {
 		renderHTML = spanTemp.format(statusColor, _('HomeProxy'), version, _('NOT RUNNING'));
 
 	if (currentNode)
-		renderHTML += '<em style="margin-left:8px"><span style="color:%s"><strong>%s</strong></span></em>'.format(nodeColor, currentNode);
+		renderHTML += '<div><em><span style="color:%s"><strong>%s</strong></span></em></div>'.format(nodeColor, currentNode);
 
 	return renderHTML;
 }
@@ -125,10 +125,9 @@ return view.extend({
 
 					if (current?.mode === 'urltest') {
 						let active = current.active || {};
-						if (active?.id && active.id !== 'urltest')
-							current_label = _('URLTest: %s').format(proxy_nodes[active.id] || active.label || active.id);
-						else
-							current_label = _('URLTest');
+						let nodeName = (active?.id && active.id !== 'urltest') ? (proxy_nodes[active.id] || active.label || active.id) : _('Invalid node');
+
+						current_label = _('URLTest: %s').format(nodeName);
 					}
 
 					let view = document.getElementById('service_status');
