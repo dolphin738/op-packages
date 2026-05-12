@@ -21,6 +21,13 @@ jobs:
         run: |
           git config --global user.name "dolphin738"
           git config --global user.email "dolphin738@sina.com"
+      - name: 删除特定文件夹
+        run: |
+          echo "🧹 清理目录..."
+          # -r: 递归删除目录及其内容
+          # -f: 强制删除，不提示确认
+          rm -rf ./luci/luci-app-adguardhome
+          rm -rf ./luci/luci-app-turboacc
       - name: 读取配置并同步多源插件
         env:
           CONFIG_FILE: "sync_config.txt" # 配置文件路径
