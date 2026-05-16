@@ -15,7 +15,6 @@ shortcut-fe:luci
 luci-app-taskplan:luci
 luci-app-timedreboot:luci
 luci-app-wolplus:luci
-luci-app-socat:luci
 luci-app-netspeedtest:luci
 luci-app-dockerman:luci
 luci-lib-docker:luci
@@ -29,6 +28,10 @@ adguardhome:luci
 # --------- VIKINGYFY --------
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
 ./:luci/luci-app-homeproxy/
+
+# --------- Lienol --------
+REPO:https://github.com/Lienol/openwrt-package.git:main
+luci-app-socat:luci
 
 # --------- immortalwrt-luci --------
 REPO:https://github.com/immortalwrt/luci.git:master
