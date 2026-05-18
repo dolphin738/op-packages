@@ -1,137 +1,239 @@
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: PACKAGE VERSION\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
-"Language: zh\n"
+"Project-Id-Version: luci-app-adguardhome\n"
+"PO-Revision-Date: 2024\n"
+"Last-Translator: kenzok8\n"
+"Language-Team: Chinese\n"
+"Language: zh_Hans\n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "AdGuard Home"
-msgstr ""
+msgstr "AdGuard Home"
 
-msgid "AdGuard Home Configuration"
-msgstr "配置"
+msgid "Base Setting"
+msgstr "基础设置"
 
-msgid "AdGuard Home Statistics"
-msgstr "统计"
-
-msgid "AdGuard Home Status"
-msgstr "状态"
-
-msgid "AdGuard Home Status - Error"
-msgstr "状态 - 错误"
-
-msgid "Average processing time (seconds)"
-msgstr "平均处理时间（秒）"
-
-msgid "Bootstrap DNS addresses"
-msgstr "Bootstrap DNS 地址"
-
-msgid "Configuration"
-msgstr "配置"
-
-msgid "DNS blocks"
-msgstr "DNS 拦截"
-
-msgid "DNS listen addresses"
-msgstr "DNS 监听地址"
-
-msgid "DNS listen port"
-msgstr "DNS 监听端口"
-
-msgid "DNS queries"
-msgstr "DNS 查询"
-
-msgid "DNS replacements (malware/phishing)"
-msgstr "DNS 替换（恶意软件/钓鱼）"
-
-msgid "DNS replacements (safesearch)"
-msgstr "DNS 替换（安全搜索）"
-
-msgid "General settings"
-msgstr "常规设置"
-
-msgid "Grant permissions for the AdGuard Home LuCI app"
-msgstr "授予 AdGuard Home LuCI 应用权限"
-
-msgid "Logs"
+msgid "Log"
 msgstr "日志"
 
-msgid "No"
-msgstr "否"
+msgid "Manual Config"
+msgstr "手动配置"
 
-msgid "Not found"
-msgstr "未找到"
+msgid "Enable"
+msgstr "启用"
 
-msgid "Password for AdGuard Home"
-msgstr "密码"
+msgid "Browser management port"
+msgstr "网页管理端口"
 
-msgid "Please open the Configuration section, and provide the credentials."
-msgstr "请打开配置部分，并提供凭证。"
+msgid "Redirect"
+msgstr "重定向"
 
-msgid "Protection enabled"
-msgstr "保护已启用"
+msgid "AdGuardHome redirect mode"
+msgstr "AdGuardHome 重定向模式"
 
-msgid "RPC call failure:"
-msgstr "RPC 调用失败："
+msgid "none"
+msgstr "无"
 
-msgid "Running"
-msgstr "运行中"
+msgid "Run as dnsmasq upstream server"
+msgstr "作为 dnsmasq 上游服务器"
 
-msgid "Showing last 50 lines"
-msgstr "显示最近的50行"
+msgid "Redirect 53 port to AdGuardHome"
+msgstr "重定向 53 端口到 AdGuardHome"
 
-msgid "Statistics period (days)"
-msgstr "统计周期（天）"
+msgid "Use port 53 replace dnsmasq"
+msgstr "使用 53 端口替换 dnsmasq"
 
-msgid "Status"
-msgstr "状态"
+msgid "Update"
+msgstr "更新"
 
-msgid "System Log (AdGuard Home)"
-msgstr "系统日志"
+msgid "Update core version"
+msgstr "更新核心版本"
 
-msgid "The password you configured when you set up AdGuard Home"
-msgstr "您在设置 AdGuard Home 时配置的密码"
+msgid "core version:"
+msgstr "核心版本:"
 
-msgid "The username you configured when you set up AdGuard Home"
-msgstr "您在设置 AdGuard Home 时配置的用户名"
+msgid "no config"
+msgstr "无配置文件"
 
-msgid ""
-"This application requires the username and password that were configured "
-"when you set up AdGuard Home, as the REST API for AdGuard Home is password "
-"protected. The password cannot be read from the YAML configuration file for "
-"AdGuard Home, as it is encrypted in that store. The credentials supplied "
-"here will be stored unencrypted in /etc/config/adguardhome on your device."
-msgstr ""
-"此应用程序需要您在设置 AdGuard Home 时配置的用户名和密码，因为 AdGuard Home 的 REST API 受密码保护。"
-"密码无法从 AdGuard Home 的 YAML 配置文件中读取，因为它在存储中是加密的。"
-"此处提供的凭证将以未加密的形式存储在设备上的 /etc/config/adguardhome 中。"
+msgid "no core"
+msgstr "无核心程序"
 
-msgid "Top Blocked Domains"
-msgstr "最常被拦截的域名"
+msgid "core error"
+msgstr "核心错误"
 
-msgid "Top Queried Domains"
-msgstr "最常查询的域名"
+msgid "Bin Path"
+msgstr "执行文件路径"
 
-msgid "Unable to load log data:"
-msgstr "无法加载日志数据："
+msgid "AdGuardHome Bin path if no bin will auto download"
+msgstr "AdGuardHome 执行文件路径，如果没有执行文件将自动下载"
 
-msgid "Upstream DNS addresses"
-msgstr "上游 DNS 地址"
+msgid "Config Path"
+msgstr "配置文件路径"
 
-msgid "Username for AdGuard Home"
-msgstr "用户名"
+msgid "AdGuardHome config path"
+msgstr "AdGuardHome 配置文件路径"
 
-msgid "Version"
-msgstr "版本"
+msgid "Work dir"
+msgstr "工作目录"
 
-msgid "Web interface"
-msgstr "AdGuardHome 管理界面"
+msgid "AdGuardHome work dir include rules,audit log and database"
+msgstr "AdGuardHome 工作目录，包含规则、审计日志和数据库"
 
-msgid "Yes"
-msgstr "是"
+msgid "Runtime log file"
+msgstr "运行日志"
+
+msgid "AdGuardHome runtime Log file if 'syslog': write to system log;if empty no log"
+msgstr "AdGuardHome 运行日志，填写 syslog 将写入系统日志，空白则不记录日志"
+
+msgid "Verbose log"
+msgstr "详细日志"
+
+msgid "use upx to compress bin after download"
+msgstr "下载后使用 upx 压缩执行文件"
+
+msgid "compress faster"
+msgstr "快速压缩"
+
+msgid "compress better"
+msgstr "更好压缩"
+
+msgid "compress best(can be slow for big files)"
+msgstr "最好压缩（大文件可能很慢）"
+
+msgid "try all available compression methods & filters [slow]"
+msgstr "尝试所有压缩方法（慢）"
+
+msgid "try even more compression variants [very slow]"
+msgstr "尝试更多压缩变体（很慢）"
+
+msgid "bin use less space,but may have compatibility issues"
+msgstr "减小执行文件空间占用，但可能有兼容性问题"
+
+msgid "Del gfwlist"
+msgstr "删除 GFW 列表"
+
+msgid "Add gfwlist"
+msgstr "添加 GFW 列表"
+
+msgid "Added"
+msgstr "已添加"
+
+msgid "Not added"
+msgstr "未添加"
+
+msgid "Del"
+msgstr "删除"
+
+msgid "Add"
+msgstr "添加"
+
+msgid "Gfwlist upstream dns server"
+msgstr "GFW 列表上游 DNS 服务器"
+
+msgid "Gfwlist domain upstream dns service"
+msgstr "GFW 列表域名上游 DNS 服务"
+
+msgid "Change browser management password"
+msgstr "更改网页管理密码"
+
+msgid "Press load culculate model and culculate finally save/apply"
+msgstr "点击载入计算模块，然后计算，最后保存/应用"
+
+msgid "Keep files when system upgrade"
+msgstr "系统升级时保留文件"
+
+msgid "core bin"
+msgstr "核心执行文件"
+
+msgid "config file"
+msgstr "配置文件"
+
+msgid "log file"
+msgstr "日志文件"
+
+msgid "sessions.db"
+msgstr "会话数据库"
+
+msgid "stats.db"
+msgstr "统计数据库"
+
+msgid "querylog.json"
+msgstr "审计日志.json"
+
+msgid "filters"
+msgstr "过滤器"
+
+msgid "On boot when network ok restart"
+msgstr "开机后网络就绪时重启"
+
+msgid "Backup workdir files when shutdown"
+msgstr "关机时备份工作目录文件"
+
+msgid "Backup workdir path"
+msgstr "工作目录备份路径"
+
+msgid "Will be restore when workdir/data is empty"
+msgstr "当工作目录/data 为空时恢复"
+
+msgid "Crontab task"
+msgstr "计划任务"
+
+msgid "Please change time and args in crontab"
+msgstr "请在计划任务中修改时间和参数"
+
+msgid "Auto update core"
+msgstr "自动更新核心"
+
+msgid "Auto tail querylog"
+msgstr "自动截断查询日志"
+
+msgid "Auto tail runtime log"
+msgstr "自动截断运行日志"
+
+msgid "Auto update ipv6 hosts and restart adh"
+msgstr "自动更新 IPv6 主机并重启"
+
+msgid "Auto update gfwlist and restart adh"
+msgstr "自动更新 GFW 列表并重启"
+
+msgid "Download links for update"
+msgstr "升级用的下载链接"
+
+msgid "Free and open source, powerful network-wide ads & trackers blocking DNS server."
+msgstr "免费开源、功能强大的全网络广告和跟踪程序拦截 DNS 服务器"
+
+msgid "Check..."
+msgstr "检查中..."
+
+msgid "Force update"
+msgstr "强制更新"
+
+msgid "Updated"
+msgstr "已更新"
+
+msgid "Fast config"
+msgstr "快速配置"
+
+msgid "reverse"
+msgstr "逆序"
+
+msgid "localtime"
+msgstr "本地时间"
+
+msgid "dellog"
+msgstr "删除日志"
+
+msgid "download log"
+msgstr "下载日志"
+
+msgid "Please add log path in config to enable log"
+msgstr "请在设置里填写日志路径以启用日志"
+
+msgid "Collecting data..."
+msgstr "获取数据中..."
 
 msgid "RUNNING"
 msgstr "运行中"
@@ -139,41 +241,89 @@ msgstr "运行中"
 msgid "NOT RUNNING"
 msgstr "未运行"
 
-msgid "Collecting data..."
-msgstr "获取数据中..."
+msgid "Redirected"
+msgstr "已重定向"
 
-msgid "Enable"
-msgstr "启用"
+msgid "Not redirect"
+msgstr "未重定向"
 
-msgid "Redirect"
-msgstr "重定向"
+msgid "WARNING: no binary found, config validation will be skipped"
+msgstr "警告：未找到执行文件，提交配置时将跳过校验"
 
-msgid "none"
-msgstr "无"
+msgid "WARNING!!! no bin found apply config will not be test"
+msgstr "警告！！！未找到执行文件，提交配置将不会进行校验"
 
-msgid "Run as dnsmasq upstream server"
-msgstr "作为dnsmasq的上游服务器"
+msgid "Reload Config"
+msgstr "重新加载配置"
 
-msgid "Redirect 53 port to AdGuardHome"
-msgstr "重定向53端口到AdGuardHome"
+msgid "Use template"
+msgstr "使用模板"
 
-msgid "Use port 53 replace dnsmasq"
-msgstr "使用53端口替换dnsmasq"
+msgid "Culculate"
+msgstr "计算"
 
-msgid "AdGuardHome redirect mode"
-msgstr "重定向模式"
+msgid "loading..."
+msgstr "载入中..."
 
-msgid "Change Password"
-msgstr "修改密码"
+msgid "Please save/apply"
+msgstr "请提交"
 
-msgid "Work Dir"
-msgstr "工作目录"
+msgid "is empty"
+msgstr "为空"
+
+msgid "Load culculate model"
+msgstr "载入计算模块"
+
+msgid "Reveal/hide password"
+msgstr "显示/隐藏密码"
+
+msgid "Error: bin path is a directory"
+msgstr "错误：执行文件路径是一个目录"
+
+msgid "Error: config path is a directory"
+msgstr "错误：配置文件路径是一个目录"
+
+msgid "Error: work dir is a file"
+msgstr "错误：工作目录是一个文件"
+
+msgid "Error: log file is a directory"
+msgstr "错误：日志文件是一个目录"
+
+msgid "Error: backup dir is a file"
+msgstr "错误：备份目录是一个文件"
 
 msgid "Service user"
-msgstr "以此用户权限运行"
+msgstr "服务用户"
+
+msgid "User the service runs under. If empty, defaults to 'adguardhome'."
+msgstr "服务运行的用户。留空则默认为 'adguardhome'。"
 
 msgid "Service group"
-msgstr "以此用户组权限运行"
+msgstr "服务用户组"
 
-msgid "Configuration file"
-msgstr "配置文件"
+msgid "Group the service runs under. If empty, defaults to 'adguardhome'."
+msgstr "服务运行的用户组。留空则默认为 'adguardhome'。"
+
+msgid "Read-only file access"
+msgstr "只读文件访问"
+
+msgid "Directories or files AdGuardHome can read. One path per line."
+msgstr "AdGuardHome 可读取的目录或文件。每行一个路径。"
+
+msgid "Read-write file access"
+msgstr "读写文件访问"
+
+msgid "Directories or files AdGuardHome can write. One path per line."
+msgstr "AdGuardHome 可写入的目录或文件。每行一个路径。"
+
+msgid "Show advanced settings"
+msgstr "显示高级设置"
+
+msgid "Tunes the garbage collector. If empty, defaults to 100."
+msgstr "调优垃圾回收器。留空则默认为 100。"
+
+msgid "Max number of OS threads for Go. If empty, defaults to matching number of CPUs."
+msgstr "Go 可使用的最大系统线程数。留空则默认匹配 CPU 数量。"
+
+msgid "Soft memory cap for Go runtime. If empty, defaults to unset."
+msgstr "Go 运行时的软内存上限。留空则默认不限制。"
