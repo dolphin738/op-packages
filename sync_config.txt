@@ -5,7 +5,7 @@
 
 # --- kiddin9/op-packages ---
 REPO:https://github.com/kiddin9/op-packages.git:main
-luci-app-adguardhome:luci
+#luci-app-adguardhome:luci
 luci-app-wrtbwmon:luci
 wrtbwmon:luci
 homebox:luci
@@ -21,9 +21,9 @@ luci-lib-docker:luci
 dockerd:luci
 
 # --------- kenzok8 --------
-#REPO:https://github.com/kenzok8/jell.git:main
-#luci-app-adguardhome:luci
-#adguardhome:luci
+REPO:https://github.com/kenzok8/jell.git:main
+luci-app-adguardhome:luci
+adguardhome:luci
 
 # --------- VIKINGYFY --------
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
