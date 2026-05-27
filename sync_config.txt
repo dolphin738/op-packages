@@ -17,7 +17,7 @@ luci-app-timedreboot:luci
 luci-app-wolplus:luci
 luci-app-netspeedtest:luci
 #luci-app-dockerman:luci
-#luci-lib-docker:luci
+luci-lib-docker:luci
 #dockerd:luci
 
 # --------- kenzok8 --------
