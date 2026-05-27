@@ -26,6 +26,7 @@ luci-app-adguardhome:luci
 adguardhome:luci
 luci-app-dockerman:luci
 dockerd:luci
+docker:luci
 
 # --------- VIKINGYFY --------
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
