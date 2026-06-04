@@ -16,17 +16,17 @@ luci-app-taskplan:luci
 luci-app-timedreboot:luci
 luci-app-wolplus:luci
 luci-app-netspeedtest:luci
-#luci-app-dockerman:luci
+luci-app-dockerman:luci
 luci-lib-docker:luci
-#dockerd:luci
+dockerd:luci
 
 # --------- kenzok8 --------
 REPO:https://github.com/kenzok8/jell.git:main
 luci-app-adguardhome:luci
 adguardhome:luci
-luci-app-dockerman:luci
-dockerd:luci
-docker:luci
+#luci-app-dockerman:luci
+#dockerd:luci
+#docker:luci
 
 # --------- VIKINGYFY --------
 REPO:https://github.com/VIKINGYFY/homeproxy.git:main
