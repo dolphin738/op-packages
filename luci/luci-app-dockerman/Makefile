@@ -2,20 +2,17 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI Support for docker
 LUCI_DEPENDS:=@(aarch64||arm||x86_64) \
-	+luci-compat \
-	+luci-lib-docker \
-	+luci-lib-ip \
-	+docker +dockerd \
+	+luci-base \
+	+docker \
+	+ttyd \
 	+dockerd \
-	+ttyd
-LUCI_PKGARCH:=all
+	+docker-compose \
+	+ucode-mod-socket
 
 PKG_LICENSE:=AGPL-3.0
-PKG_MAINTAINER:=lisaac <lisaac.cn@gmail.com> \
+PKG_MAINTAINER:=Paul Donald <newtwen+github@gmail.com> \
 		Florian Eckert <fe@dev.tdt.de>
 
-PKG_VERSION:=v0.5.26
-PKG_RELEASE:=252
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
