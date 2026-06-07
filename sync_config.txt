@@ -19,6 +19,8 @@ luci-app-netspeedtest:luci
 luci-app-dockerman:luci
 luci-lib-docker:luci
 dockerd:luci
+luci-app-softethervpn:luci
+luci-app-openvpn-server-client:luci
 
 # --------- kenzok8 --------
 REPO:https://github.com/kenzok8/jell.git:main
