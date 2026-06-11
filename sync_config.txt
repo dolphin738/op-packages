@@ -22,6 +22,7 @@ dockerd:luci
 luci-app-softethervpn:luci
 luci-app-openvpn-server-client:luci
 luci-app-xl2tpd:luci
+xl2tpd-ext:luci
 
 # --------- kenzok8 --------
 REPO:https://github.com/kenzok8/jell.git:main
